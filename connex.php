@@ -19,23 +19,29 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $error = "Veuillez remplir tous les champs";
     } else {
         try {
-            // Connexion à la base de donnée
+            // Connexion à la base de données
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             
-            // Rechercher l'utilisateur par email
-            $stmt = $pdo->prepare("SELECT id, email, password FROM users WHERE email = ?");
+            // Rechercher l'utilisateur par email dans la table INSCRIPTION
+            $stmt = $pdo->prepare("SELECT id, nom, prenom, email, mdp FROM inscription WHERE email = ?");
             $stmt->execute([$email]);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
             
-            if ($user && password_verify($password, $user['password'])) {
-                // Connexion réussie
-                $_SESSION['user_id'] = $user['id'];
-                $_SESSION['user_email'] = $user['email'];
-                
-                /* Redirection vers la page d'accueil ou profil
-                header('Location: profil.php');
-                */
-                exit();
+            if ($user) {
+                // Vérifier le mot de passe
+                if (password_verify($password, $user['mdp'])) {
+                    // Connexion réussie
+                    $_SESSION['connex_id'] = $user['id'];
+                    $_SESSION['user_email'] = $user['email'];
+                    $_SESSION['user_nom'] = $user['nom'];
+                    $_SESSION['user_prenom'] = $user['prenom'];
+                    
+                    // Redirection vers le dashboard
+                    header('Location: dashboard.html.php');
+                    exit();
+                } else {
+                    $error = "Email ou mot de passe incorrect";
+                }
             } else {
                 $error = "Email ou mot de passe incorrect";
             }
