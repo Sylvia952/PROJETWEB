@@ -1,16 +1,11 @@
 <?php
 include "../config.php";
 session_start();
-
-
-if (!isset($_SESSION['connex_id'])) {
-    header('Location: ../index.php');
-    exit();
-}
+//j'ai supprimer la session qui étais ici 
 
 
 try {
-    $stmt = $pdo->prepare("SELECT * FROM produits ORDER BY dtp ASC");
+    $stmt = $pdo->prepare("SELECT * FROM ajt_pdt ORDER BY nom ASC");// le nom de la table ici, c'est ajt_pdt et non produits car tu nas pas une table produits dans ta base de donnée et aussi le nom de l'attribut apres  ORDER BY c'est nom et non dtp
     $stmt->execute();
     $produits = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {

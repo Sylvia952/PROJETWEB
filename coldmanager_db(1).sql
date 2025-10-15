@@ -54,22 +54,13 @@ CREATE TABLE `ajt_pdt` (
 -- Structure de la table `categorie`
 --
 
-CREATE TABLE `categorie` (
+CREATE TABLE `categories` (
   `id` int(11) NOT NULL,
   `nom` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
---
--- Structure de la table `connex`
---
-
-CREATE TABLE `connex` (
-  `id` int(11) NOT NULL,
-  `email` varchar(100) NOT NULL,
-  `mdp` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -77,7 +68,7 @@ CREATE TABLE `connex` (
 -- Structure de la table `employe`
 --
 
-CREATE TABLE `employe` (
+CREATE TABLE `employes` (
   `id` int(11) NOT NULL,
   `nom` varchar(50) NOT NULL,
   `prenom` varchar(50) NOT NULL,

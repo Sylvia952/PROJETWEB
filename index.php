@@ -1,13 +1,13 @@
 <?php
 session_start();
 include "config.php";
-/*
+
 $error = '';
 $success = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['login'])) {
     $email = trim($_POST['email']);
-    $password = $_POST['password'];
+    $password = $_POST['mdp'];// le nom de la colonne du mot de passe qui est mdp et non password
     
     if (empty($email) || empty($password)) {
         $error = "Veuillez remplir tous les champs";
@@ -15,22 +15,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['login'])) {
         try {
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             
-            $stmt = $pdo->prepare("SELECT id, nom, prenom, email, mdp FROM connex WHERE email = ?");
+            $stmt = $pdo->prepare("SELECT * FROM inscription WHERE email = ?");// le nom de la table ici, c'est inscription et non connex , tu as fait une erreur dans le nom de la table et aussi dans le nom de la colonne du mot de passe qui est mdp et non password
             $stmt->execute([$email]);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
             
             if ($user && password_verify($password, $user['mdp'])) {
               
-                $_SESSION['connex_id'] = $user['id'];
                 $_SESSION['user_email'] = $user['email'];
                 $_SESSION['user_nom'] = $user['nom'];
                 $_SESSION['user_prenom'] = $user['prenom'];
                 
-            
                 header('Location: DASHBOARD/produits.php');
                 exit();
             } else {
-                $error = "Email ou mot de passe incorrect";
+                $error = "Email ou mot de passe incorrect------";
             }
             
         } catch (PDOException $e) {
@@ -76,12 +74,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['register'])) {
     }
 }
 
-
-if (isset($_SESSION['connex_id'])) {
-    header('Location: DASHBOARD/produits.php');
-    exit();
-}
-*/
 ?>
 
 
@@ -183,7 +175,9 @@ if (isset($_SESSION['connex_id'])) {
 
       <div class="mb-3">
         <label for="password" class="form-label">Mot de passe</label>
-        <input type="password" class="form-control" id="password" name="password" placeholder="Entrez votre mot de passe" required>
+        <input type="password" class="form-control" id="password" name="mdp" placeholder="Entrez votre mot de passe" required>
+        <!-- // le nom de la colonne du mot de passe qui est mdp et non password : le name-->
+
       </div>
 
       <button type="submit" class="btn btn-custom mt-3"><i class="fa-solid fa-lock me-2"></i> Se connecter</button>
@@ -221,7 +215,7 @@ if (isset($_SESSION['connex_id'])) {
 
       <div class="mb-3">
         <label for="password2" class="form-label">Mot de passe</label>
-        <input type="password" class="form-control" id="password2" name="password" placeholder="Créez un mot de passe" required>
+        <input type="password" class="form-control" id="password2" name="password" placeholder="Créez un mot de passe" required> 
       </div>
 
       <button type="submit" class="btn btn-custom mt-3"><i class="fa-solid fa-user-check me-2"></i> S'inscrire</button>
