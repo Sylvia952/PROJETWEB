@@ -7,7 +7,7 @@ $success = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['login'])) {
     $email = trim($_POST['email']);
-    $password = $_POST['mdp'];// le nom de la colonne du mot de passe qui est mdp et non password
+    $password = $_POST['mdp'];
     
     if (empty($email) || empty($password)) {
         $error = "Veuillez remplir tous les champs";
@@ -15,20 +15,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['login'])) {
         try {
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             
-            $stmt = $pdo->prepare("SELECT * FROM inscription WHERE email = ?");// le nom de la table ici, c'est inscription et non connex , tu as fait une erreur dans le nom de la table et aussi dans le nom de la colonne du mot de passe qui est mdp et non password
+            $stmt = $pdo->prepare("SELECT * FROM inscription WHERE email = ?");
             $stmt->execute([$email]);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
             
             if ($user && password_verify($password, $user['mdp'])) {
-              
+                
+                $_SESSION['user_id'] = $user['id'];
                 $_SESSION['user_email'] = $user['email'];
                 $_SESSION['user_nom'] = $user['nom'];
                 $_SESSION['user_prenom'] = $user['prenom'];
+                $_SESSION['user_role'] = $user['role'];
                 
-                header('Location: DASHBOARD/produits.php');
+                
+                if ($user['role'] == 'admin') {
+                    header('Location: DASHBOARD/dashboard.php');
+                } else {
+                    header('Location: DASHBOARD/produits.php');
+                }
                 exit();
             } else {
-                $error = "Email ou mot de passe incorrect------";
+                $error = "Email ou mot de passe incorrect";
             }
             
         } catch (PDOException $e) {
@@ -37,47 +44,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['login'])) {
     }
 }
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['register'])) {
-    $nom = trim($_POST['nom']);
-    $prenom = trim($_POST['prenom']);
-    $email = trim($_POST['email']);
-    $password = $_POST['password'];
-    
-    if (empty($nom) || empty($prenom) || empty($email) || empty($password)) {
-        $error = "Tous les champs doivent être remplis";
-    } else {
-        try {
-          
-            $stmt = $pdo->prepare("SELECT id FROM inscription WHERE email = ?");
-            $stmt->execute([$email]);
-            
-            if ($stmt->fetch()) {
-                $error = "Cet email est déjà utilisé";
-            } else {
-              
-                $mdp_hashed = password_hash($password, PASSWORD_DEFAULT);
-                
-                $stmt = $pdo->prepare("INSERT INTO inscription (nom, prenom, email, mdp) VALUES (?, ?, ?, ?)");
-                
-                if ($stmt->execute([$nom, $prenom, $email, $mdp_hashed])) {
-                    $success = "Inscription réussie ! Vous pouvez maintenant vous connecter.";
-                   
-                    echo "<script>document.getElementById('loginForm').classList.remove('d-none'); document.getElementById('registerForm').classList.add('d-none');</script>";
-                } else {
-                    $error = "Erreur lors de l'inscription";
-                }
-            }
-            
-        } catch (PDOException $e) {
-            $error = "Erreur: " . $e->getMessage();
-        }
-    }
-}
 
 ?>
-
-
-
 
 
 <!DOCTYPE html>
