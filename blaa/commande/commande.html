@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" type="text/css" href="../cssjs/css/commade.css">
+	<link rel="stylesheet" type="text/css" href="../cssjs/css/responsive_commandes.css">
+	<link rel="stylesheet" type="text/css" href="../cssjs/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="../cssjs/css/bootstrap.css">
+	<link rel="stylesheet" type="text/css" href="../cssjs/font/all.min.css">
+	<link rel="stylesheet" type="text/css" href="../cssjs/font/fontawesome.min.css">
+	<title></title>
+</head>
+<body>
+
+	<div class="navigation_phone">
+		<div class="logo">
+			<h5>ELEDJA</h5>
+
+			<div class="btn_menu">
+				<i class="fas fa-times"></i>
+			</div>
+		</div>
+
+		<div class="link_content_phone">
+			<a href="" class="active">
+				<i class="fas fa-tachometer-alt"></i>
+				<h4>Tableau de bord</h4>
+			</a>
+
+			<a href="">
+				<i class="far fa-user"></i>
+				<h4>Clients</h4>
+			</a>
+
+			<a href="commande/commande.html">
+				<i class="fas fa-cart-arrow-down"></i>
+				<h4>Commandes</h4>
+			</a>
+
+			<a href="">
+				<i class="fas fa-chart-bar"></i>
+				<h4>Statistques</h4>
+			</a>
+
+			<a href="">
+				<i class="fas fa-envelope"></i>
+				<h4>Messagerie</h4>
+			</a>
+
+			<a href="">
+				<i class="fas fa-shopping-bag"></i>
+				<h4>produit</h4>
+			</a>
+
+			<a href="">
+				<i class="fas fa-chart-line"></i>
+				<h4>Rapport</h4>
+			</a>
+
+			<a href="">
+				<i class="fas fa-cog"></i>
+				<h4>Reglage</h4>
+			</a>
+
+			<a href="">
+				<i class="fas fa-add"></i>
+				<h4>ajouter un produit</h4>
+			</a>
+		</div>
+
+		<a href="" class="log_out">
+			<i class="fas fa-sign-out-alt"></i>
+			<h3>Déconnexion</h3>
+		</a>
+	</div>
+
+	<div class="content_commande">
+
+		<div class="navigation">
+			<div class="logo">
+				<h5>ELEDJA</h5>
+			</div>
+
+			<div class="link_content">
+				<a href="" class="active">
+					<i class="fas fa-tachometer-alt"></i>
+					<h4>Tableau de bord</h4>
+				</a>
+
+				<a href="">
+					<i class="far fa-user"></i>
+					<h4>Clients</h4>
+				</a>
+
+				<a href="../commande/commande.html">
+					<i class="fas fa-cart-arrow-down"></i>
+					<h4>Commandes</h4>
+				</a>
+
+				<a href="">
+					<i class="fas fa-chart-bar"></i>
+					<h4>Statistques</h4>
+				</a>
+
+				<a href="">
+					<i class="fas fa-envelope"></i>
+					<h4>Messagerie</h4>
+				</a>
+
+				<a href="">
+					<i class="fas fa-shopping-bag"></i>
+					<h4>produit</h4>
+				</a>
+
+				<a href="">
+					<i class="fas fa-chart-line"></i>
+					<h4>Rapport</h4>
+				</a>
+
+				<a href="">
+					<i class="fas fa-cog"></i>
+					<h4>Reglage</h4>
+				</a>
+
+				<a href="">
+					<i class="fas fa-add"></i>
+					<h4>ajouter un produit</h4>
+				</a>
+			</div>
+
+			<a href="" class="log_out">
+				<i class="fas fa-sign-out-alt"></i>
+				<h3>Déconnexion</h3>
+			</a>
+		</div>
+
+		<div class="main">
+			<div class="main_header">
+
+				<div class="menu">
+					<i class="fas fa-bars"></i>
+					<h3>Dashboard</h3>
+				</div>
+
+				<div class="extra_header">
+					<div class="dark_mode">
+						<i class="fas fa-sun"></i>
+						<i class="fas fa-moon active"></i>
+					</div>
+
+					<div class="profil">
+						<div class="profil_info">
+							<h5>KINKIN Ariel</h5>
+							<h6>Admin</h6>
+						</div>
+
+						<div class="img_profil">
+							<img src="../images/FB_IMG_16087563964005121.jpg">
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="main_content">
+				<div class="commande_info">
+					<div class="commande_vente">
+						<h5>Ce mois ci</h5>
+						<h2>150 700 FCFA</h2>
+						<h6>+25% du mois passé</h6>
+
+						<div id="myProgress">
+					        <div id="myBar"></div>
+					    </div>
+					    <!-- <button onclick="move()">Démarrer le chargement</button> -->
+					</div>
+
+					<div class="commande_vente">
+						<h5>Ce mois ci</h5>
+						<h2>150 700 FCFA</h2>
+						<h6>+25% du mois passé</h6>
+
+						<div id="myProgress">
+					        <div id="myBar"></div>
+					    </div>
+					    <!-- <button onclick="move()">Démarrer le chargement</button> -->
+					</div>
+				</div>
+
+				<div class="commande_view">
+					<div class="commande_view_header">
+						<div class="date_option">
+							<h6 class="active">Week</h6>
+							<h6>Month</h6>
+							<h6>Year</h6>
+						</div>
+
+						<div class="filter_option">
+						    <button class="filter-button"><i class="fa fa-filter" aria-hidden="true"></i> <h6>Filtrer</h6></button>
+						    <div class="filter-menu">
+						        <p>Filter by</p>
+						        <label><input type="checkbox" checked> Fulfilled</label><br>
+						        <label><input type="checkbox"> Declined</label><br>
+						        <label><input type="checkbox"> Refunded</label>
+						    </div>
+						</div>
+					</div>
+					<div class="commande_custom">
+						<div class="custom_header">
+							<h5>Commandes Faites</h5>
+							<h6>Ici sont les recentes commandes faites.</h6>
+						</div>
+
+						<table>
+							<tr>
+						    	<th>Clients</th>
+						    	<th>Produits </th>
+						    	<th>Status</th>
+						    	<th>Date</th>
+						    	<th>Montant</th>
+							</tr>
+
+							<tr>
+						    	<td>John Doe</td>
+						    	<td>POI_TIL</td>
+						    	<td>Délivrer</td>
+						    	<td>17-07-2024</td>
+						    	<td>125 000f</td>
+							</tr>
+
+							<tr>
+						    	<td>John Doe</td>
+						    	<td>VIAN_GES</td>
+						    	<td>Délivrer</td>
+						    	<td>17-07-2024</td>
+						    	<td>125 000f</td>
+							</tr>
+
+							<tr>
+						    	<td>John Doe</td>
+						    	<td>POI_TIL</td>
+						    	<td>Délivrer</td>
+						    	<td>17-07-2024</td>
+						    	<td>125 000f</td>
+							</tr>
+
+							<tr>
+						    	<td>John Doe</td>
+						    	<td>VIAN_GES</td>
+						    	<td>Délivrer</td>
+						    	<td>17-07-2024</td>
+						    	<td>125 000f</td>
+							</tr>
+						</table>
+
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="extra">
+			<div class="extra_phone">
+				<div class="extra_header">
+					<div class="dark_mode">
+						<i class="fas fa-sun"></i>
+						<i class="fas fa-moon active"></i>
+					</div>
+
+					<div class="profil">
+						<div class="profil_info">
+							<h5>KINKIN Ariel</h5>
+							<h6>Admin</h6>
+						</div>
+
+						<div class="img_profil">
+							<img src="../images/FB_IMG_16087563964005121.jpg">
+						</div>
+					</div>
+				</div>
+
+				<div class="extra_body">
+					<div class="extra_body_head">
+						<h5>Commande : COM125</h5>
+						<h6>Date : 17 Juillet 2024</h6>
+					</div>
+
+					<div class="extra_body_content">
+						<h6>Détail commandes</h6>
+						<table>
+							<tr>
+						    	<th>Produits</th>
+						    	<th>Prix unitaire</th>
+							</tr>
+
+							<tr>
+						    	<td>Requin</td>
+						    	<td>15000f</td>
+
+							</tr>
+
+							<tr>
+						    	<td>Poulet</td>
+						    	<td>1500</td>
+							</tr>
+						</table>
+
+						<hr width="100%">
+
+						<table>
+							<tr>
+						    	<th>Produits</th>
+						    	<th>Quantité</th>
+						    	<th>Prix</th>
+							</tr>
+
+							<tr>
+						    	<td>Requin</td>
+						    	<td>45</td>
+						    	<td>15000f</td>
+
+							</tr>
+
+							<tr>
+						    	<td>Poulet</td>
+						    	<td>21</td>
+						    	<td>1500</td>
+							</tr>
+
+							<tr>
+						    	<td>Total</td>
+						    	<td>15000f</td>
+							</tr>
+						</table>
+
+						<hr width="100%">
+
+						<h6>Informations clients</h6>
+
+						<table>
+							<tr>
+						    	<td>Client</td>
+						    	<td>John Doe</td>
+							</tr>
+
+							<tr>
+						    	<td>Téléphone</td>
+						    	<td>+229 60036256</td>
+							</tr>
+						</table>
+
+					</div>
+
+					<div class="extra_footer">
+						<h6>17 Juillet 2024</h6>
+						<div class="extra_carrousel">
+							<i class="fas fa-arrow-left"></i>
+							<i class="fas fa-arrow-right"></i>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</body>
+<script type="text/javascript">
+	function move() {
+    var elem = document.getElementById("myBar");
+    var width = 45;
+    var id = setInterval(frame, 10);
+    function frame() {
+        if (width >= 100) {
+            clearInterval(id);
+        } else {
+            width++;
+            elem.style.width = width + '%';
+            elem.innerHTML = width * 1 + '%';
+        }
+    }
+}
+
+</script>
+
+<script>
+        document.querySelector('.filter-button').addEventListener('click', function() {
+            document.querySelector('.filter-menu').classList.toggle('show');
+        });
+    </script>
+
+    	<script type="text/javascript">
+		const menu = document.querySelector(".menu");
+		const navigation_phone = document.querySelector(".navigation_phone");
+		const content_dashboard = document.querySelector(".content_dashboard");
+
+		menu.addEventListener("click", () =>{
+			navigation_phone.classList.toggle("active")
+			content_dashboard.classList.toggle("active")
+		})
+
+
+
+		const btn_menu = document.querySelector(".btn_menu");
+		const navigation_phone_back = document.querySelector(".navigation_phone");
+		const content_dashboard_back = document.querySelector(".content_dashboard");
+
+		btn_menu.addEventListener("click", () =>{
+			navigation_phone_back.classList.toggle("active")
+			content_dashboard_back.classList.toggle("active")
+		})
+	</script>
+</html>

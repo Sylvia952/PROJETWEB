@@ -1,0 +1,401 @@
+:root{
+
+}
+
+.dark_mode{
+
+}
+
+.content_dashboard{
+	width: 100%;
+	display: flex;
+	gap: 1rem;
+	background-color: rgba(0, 0, 0, 0.1);
+}
+
+.navigation{
+	width: 30%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	font-size: 10px;
+
+}
+
+.main{
+	padding: 10px;
+	width: 100%;
+}
+
+.main_header{
+	/*display: flex;
+	align-items: center;
+	width: 100%;
+	justify-content: space-between;*/
+}
+
+.main_header .extra_header{
+	display: none;
+	width: 100%;
+}
+.extra{
+	padding: 10px;
+	width: 35%;
+}
+.link_content{
+	padding: 10px;
+	width: 100%;
+}
+.link_content a{
+	color: black;
+	text-decoration: none;
+	padding: 15px;
+	display: flex;
+	align-items: center;
+	justify-content: flex-start;
+	transition: .3s;
+}
+
+.link_content a:hover{
+	border-radius: 0px 5px 5px 0;
+	background-color: rgba(255, 0, 0, 0.3);
+	transition: .3s;
+}
+
+.link_content a.active{
+	border-left: 5px solid rgb(255, 0, 0, 1.0);
+	background-color: rgba(255, 0, 0, 0.5);
+	border-radius: 0px 5px 5px 0;
+}
+
+.link_content a h4{
+	margin-left: 7%;
+	font-size: 12px;
+}
+
+.link_content a i{
+	font-size: 20px;
+}
+.menu i{
+		display: none;
+}
+.navigation a{
+	text-decoration: none;
+}
+
+.navigation_phone{
+		display: none;
+
+	}
+.log_out{
+	color: black;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+}
+
+.log_out i{
+	font-size: 20px;
+}
+
+.log_out h3{
+	margin-left: 5%;
+	font-size: 20px;
+}
+
+.main h3{
+	padding: 10px;
+
+}
+
+.card_container{
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+.card_container .two i{
+	color: yellow;
+	border-color: yellow;
+}
+
+
+/*.card_container .two{
+	box-shadow: 10px 10px 30px yellow;
+}
+
+.card_container .two .mask .fill{
+	background-color: yellow;
+}*/
+.carde{
+	padding: 20px;
+	width: 250px;
+	background-color: rgba(255, 255, 255, 0.6);
+	border-radius: 30px;
+	box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.3);
+}
+
+
+.carde i{
+	color: red;
+	font-size: 30px;
+	padding: 10px;
+	border-radius: 50%;
+	border: 2px solid red;
+}
+
+.card_content_info{
+	margin-top: 6%;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.card_info{
+	display: flex;
+	justify-content: center;
+	flex-direction: column;
+
+}
+
+.card_info h6{
+	font-weight: 700;
+	font-size: 15px;
+}
+
+.card_info h2{
+	margin-top: -5%;
+	font-weight: 700;
+	font-size: 20px;
+}
+
+.card_about h4{
+	color: rgba(0, 0, 0, 0.5);
+	font-weight: 700;
+	font-size: 15px;
+}
+
+
+.circular-progress {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+  position: relative;
+  width: 80px;
+  height: 80px;
+  
+  border-radius: 50%;
+}
+
+.circle .mask,
+.circle .fill,
+.circle .shadow {
+	top: 0;
+	left: 0;
+  width: 80px;
+  height: 80px;
+  position: absolute;
+  border-radius: 50%;
+}
+
+.circle .mask {
+
+  clip: rect(0px, 100px, 150px, 40px);
+    }
+
+.mask .fill {
+
+  clip: rect(0px, 100px, 100px, 50px);
+background-color: red;
+
+
+}
+
+.mask.full,
+.fill {
+  animation: fill ease-in-out 1s;
+  transform: rotate(126deg); /* Ajustez cette valeur pour le pourcentage */
+}
+
+@keyframes fill {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+
+    transform: rotate(126deg);
+  }
+}
+
+.inset {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+  position: absolute;
+
+  width: 60px;
+  height: 60px;
+  background-color: white;
+  border-radius: 50%;
+  line-height: 92px;
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.percentage {
+  display: block;
+}
+
+
+.commande_content{
+	margin-top: 3%;
+	width: 100%;
+	padding: 0px;
+	border-radius: 20px;
+}
+.commande_header h5, .commande_header h6{
+	font-size: 15px;
+	font-weight: 700;
+}
+.commande_header{
+	font-size: 15px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+.table{
+	padding: 20px;
+	border-radius: 20px;
+	background-color: rgba(255, 255, 255, 1.0);
+	box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.3);
+}
+/* Stylisation du tableau */
+.commande_content table {	
+  border-collapse: collapse;
+  margin: 10px 0;
+  font-weight: 700;
+  font-size: 0.9em;
+  font-family: sans-serif;
+  width: 100%;
+}
+
+/* Style des en-têtes de colonnes */
+ th {
+ 	border:none ;
+  color: #333;
+  font-weight: bold;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+/* Style des cellules de données */
+ td {
+ 	border-radius: none;
+  padding: 12px 15px;
+}
+
+/* Couleur de fond pour les lignes impaires */
+tbody tr:nth-child(even) {
+ background-color: rgba(255, 0, 0, 0.5);
+}
+
+.extra_header{
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.extra_header .dark_mode{
+
+	width: 70px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	background-color: red;
+	border-radius: 10px;
+	background-color: rgba(0, 0, 0, 0.5);
+}
+
+.extra_header .dark_mode i{
+	padding: 10px;
+	border-radius: 10px;
+	transition: 0.3s ease in out;
+}
+
+.extra_header .dark_mode i.active{
+	background-color:rgba(255, 0, 0, 0.3);
+	transition: 0.3s ease in out;
+}
+
+.profil{
+	width: 130px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.profil img{
+	height: 40px;
+	width: 40px;
+	object-fit: cover;
+	border-radius: 50%;
+}
+
+.profil .profil_info h5, .profil .profil_info h6{
+	font-size: 15px;
+	line-height: 10px;
+}
+
+.profil .profil_info h6{
+	font-size: 12px;
+	line-height: 10px;
+}
+
+.extra_body .body_content{
+	margin-top: 3%;
+	background-color: rgba(255, 255, 255, 0.6);
+	padding: 10px;
+	border-radius: 10px;
+	box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.3);
+}
+.body_info{
+	width: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+.body_info img{
+	height: 40px;
+	width: 40px;
+	object-fit: cover;
+	border-radius: 50%;
+}
+
+.body_info p{
+	padding: 5px;
+	font-size: 12px;
+}
+.extra_body_2{
+	margin-top: 10%;
+}
+.comd{
+	background-color: red;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.comd i{
+	font-size: 25px;
+	color: yellow;
+}
+
+.comd h5{
+	font-size: 15px;
+}
+
+.comd h6{
+	font-size: 13px;
+}
