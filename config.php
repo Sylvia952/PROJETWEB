@@ -10,7 +10,7 @@ require_once 'config.php';
 
 try {
 
-    $stmt = $pdo->query("SELECT COUNT(*) as total FROM employe");
+    $stmt = $pdo->query("SELECT COUNT(*) as total FROM employes");
     $result = $stmt->fetch();
     
 
