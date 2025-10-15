@@ -1,5 +1,12 @@
 <?php
-include "../config.php"; 
+include "../config.php";  // config.php à la racine
+session_start();
+
+// Vérifier si l'utilisateur est connecté
+if (!isset($_SESSION['connex_id'])) {
+    header('Location: ../index.php');
+    exit();
+}
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (
@@ -11,20 +18,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $nom = trim($_POST['nom']);
         $dtp = trim($_POST['dtp']);
 
-        $stmt = $pdo->prepare("INSERT INTO ajt_pdt (categorie, nom, dtp) VALUES (?, ?, ?)");
+        try {
+            $stmt = $pdo->prepare("INSERT INTO produits (categorie, nom, dtp) VALUES (?, ?, ?)");
 
-        if ($stmt->execute([$categorie, $nom, $dtp])) {
+            if ($stmt->execute([$categorie, $nom, $dtp])) {
+                $id_produit = $pdo->lastInsertId();
 
-            $id_ajt_pdt = $pdo->lastInsertId();
-
-        
-            header("Location: produits.php?id_ajt_pdt=" . $id_ajt_pdt);
-            exit();
-        } else {
-            echo "Erreur lors de l'insertion.";
+                // REDIRECTION CORRIGÉE : vers DASHBOARD/produits.php
+                header("Location: ../DASHBOARD/produits.php?id_produit=" . $id_produit);
+                exit();
+            } else {
+                $error = "Erreur lors de l'insertion.";
+            }
+        } catch (PDOException $e) {
+            $error = "Erreur: " . $e->getMessage();
         }
     } else {
-        echo "Tous les champs doivent être remplis.";
+        $error = "Tous les champs doivent être remplis.";
     }
 }
 ?>
@@ -37,31 +47,46 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Ajouter un produit</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .container {
+            max-width: 600px;
+        }
+    </style>
 </head>
 <body>
 
 <div class="container mt-5">
     <h2 class="text-center">Ajouter un Produit</h2>
 
+    <?php if (!empty($error)): ?>
+        <div class="alert alert-danger"><?php echo $error; ?></div>
+    <?php endif; ?>
+
     <form method="POST" class="mt-4">
-
-<div class="form-group">
-            <label for="categorie">Categorie</label>
-            <input type="text" class="form-control" name="categorie" id="categorie" placeholder="Categorie" required>
+        <div class="form-group">
+            <label for="categorie">Catégorie</label>
+            <select class="form-control" name="categorie" id="categorie" required>
+                <option value="">-- Choisissez une catégorie --</option>
+                <option value="poissons">POISSONS</option>
+                <option value="viandes">VIANDES</option>
+                <option value="saucisses">SAUCISSES</option>
+            </select>
         </div>
-
+        
         <div class="form-group">
             <label for="nom">Nom</label>
-            <input type="text" class="form-control" name="nom" id="nom" placeholder="Nom" required>
+            <input type="text" class="form-control" name="nom" id="nom" placeholder="Nom du produit" required>
         </div>
 
         <div class="form-group">
             <label for="dtp">Date de Péremption</label>
-            <input type="date" class="form-control" name="dtp" id="dtp" placeholder="Date de péremption" required>
+            <input type="date" class="form-control" name="dtp" id="dtp" required>
         </div>
 
-
-        <button type="submit" class="btn btn-primary btn-block">Ajouter Produit</button>
+        <div class="d-flex justify-content-between">
+            <a href="../DASHBOARD/produits.php" class="btn btn-secondary">Retour à la liste</a>
+            <button type="submit" class="btn btn-primary">Ajouter Produit</button>
+        </div>
     </form>
 </div>
 
@@ -71,5 +96,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 </body>
 </html>
-
-
