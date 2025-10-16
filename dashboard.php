@@ -1,6 +1,6 @@
 <?php
 session_start();
-if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'admin') {
+if (!isset($_SESSION['user_id']) ) {
     header('Location: ../index.php');
     exit();
 }
@@ -48,48 +48,120 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'admin') {
              
 
                 <nav>
-                    <ul class="space-y-1">
-                        <li>
-                            <a href="#" class="flex items-center px-4 py-2 text-blue-900 bg-blue-100 rounded-lg">
-                                <i data-feather="home" class="mr-2"></i> Dashboard
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
-                                <i data-feather="users" class="mr-2"></i> Employes
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
-                                <i data-feather="shopping-bag" class="mr-2"></i> Clients
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
-                                <i data-feather="package" class="mr-2"></i> Produits
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
-                                <i data-feather="dollar-sign" class="mr-2"></i> Sales
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
-                                <i data-feather="file-text" class="mr-2"></i> Invoices
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
-                                <i data-feather="bell" class="mr-2"></i> Alerts
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
-                                <i data-feather="bar-chart-2" class="mr-2"></i> Statistics
-                            </a>
-                        </li>
-                    </ul>
+                  <ul class="space-y-1">
+
+    <!-- Lien commun à tous -->
+    <li>
+        <a href="index.php" class="flex items-center px-4 py-2 text-blue-900 bg-blue-100 rounded-lg">
+            <i data-feather="home" class="mr-2"></i> Tableau de bord
+        </a>
+    </li>
+
+    <?php if ($_SESSION['role'] === 'admin'): ?>
+        <!-- 👑 MENU ADMINISTRATEUR -->
+        <li>
+            <a href="employes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                <i data-feather="users" class="mr-2"></i> Employés
+            </a>
+        </li>
+
+        <li>
+            <a href="clients.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                <i data-feather="user-check" class="mr-2"></i> Clients
+            </a>
+        </li>
+
+        <li>
+            <a href="produits.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                <i data-feather="package" class="mr-2"></i> Produits & Stocks
+            </a>
+        </li>
+
+        <li>
+            <a href="categories.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                <i data-feather="grid" class="mr-2"></i> Catégories
+            </a>
+        </li>
+
+        <li>
+            <a href="ventes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                <i data-feather="shopping-cart" class="mr-2"></i> Ventes
+            </a>
+        </li>
+
+        <li>
+            <a href="factures.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                <i data-feather="file-text" class="mr-2"></i> Factures
+            </a>
+        </li>
+
+        <li>
+            <a href="alertes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                <i data-feather="bell" class="mr-2"></i> Alertes (stock / péremption)
+            </a>
+        </li>
+
+        <li>
+            <a href="paiements.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                <i data-feather="credit-card" class="mr-2"></i> Paiements
+            </a>
+        </li>
+
+        <li>
+            <a href="statistiques.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                <i data-feather="bar-chart-2" class="mr-2"></i> Statistiques
+            </a>
+        </li>
+
+    <?php elseif ($_SESSION['role'] === 'user'): ?>
+        <!-- 👷 MENU EMPLOYÉ -->
+        <li>
+            <a href="clients.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                <i data-feather="users" class="mr-2"></i> Clients
+            </a>
+        </li>
+
+        <li>
+            <a href="ventes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                <i data-feather="shopping-cart" class="mr-2"></i> Enregistrer une vente
+            </a>
+        </li>
+
+        <li>
+            <a href="produits.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                <i data-feather="package" class="mr-2"></i> Produits disponibles
+            </a>
+        </li>
+
+        <li>
+            <a href="factures.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                <i data-feather="file-text" class="mr-2"></i> Factures
+            </a>
+        </li>
+
+        <li>
+            <a href="alertes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                <i data-feather="bell" class="mr-2"></i> Alertes
+            </a>
+        </li>
+
+        <li>
+            <a href="paiements.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                <i data-feather="credit-card" class="mr-2"></i> Paiements
+            </a>
+        </li>
+
+    <?php endif; ?>
+
+    <!-- Lien commun -->
+    <li>
+        <a href="logout.php" class="flex items-center px-4 py-2 text-red-700 hover:bg-red-50 rounded-lg">
+            <i data-feather="log-out" class="mr-2"></i> Déconnexion
+        </a>
+    </li>
+
+</ul>
+
                 </nav>
             </div>
 
@@ -130,7 +202,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'admin') {
                     <div class="bg-white rounded-lg shadow p-6 border-l-4 border-blue-500">
                         <div class="flex justify-between items-start">
                             <div>
-                                <p class="text-sm text-gray-500">Total Products</p>
+                                <p class="text-sm text-gray-500">Total Produits</p>
                                 <h3 class="text-2xl font-bold text-blue-800">1,245</h3>
                             </div>
                             <div class="p-3 rounded-full bg-blue-100 text-blue-600">
@@ -142,7 +214,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'admin') {
                     <div class="bg-white rounded-lg shadow p-6 border-l-4 border-red-500">
                         <div class="flex justify-between items-start">
                             <div>
-                                <p class="text-sm text-gray-500">Expired Products</p>
+                                <p class="text-sm text-gray-500">Produit Expirer</p>
                                 <h3 class="text-2xl font-bold text-red-800">23</h3>
                             </div>
                             <div class="p-3 rounded-full bg-red-100 text-red-600">
@@ -154,7 +226,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'admin') {
                     <div class="bg-white rounded-lg shadow p-6 border-l-4 border-green-500">
                         <div class="flex justify-between items-start">
                             <div>
-                                <p class="text-sm text-gray-500">Total Sales</p>
+                                <p class="text-sm text-gray-500">Total Ventes</p>
                                 <h3 class="text-2xl font-bold text-green-800">$42,567</h3>
                             </div>
                             <div class="p-3 rounded-full bg-green-100 text-green-600">
@@ -166,7 +238,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'admin') {
                     <div class="bg-white rounded-lg shadow p-6 border-l-4 border-purple-500">
                         <div class="flex justify-between items-start">
                             <div>
-                                <p class="text-sm text-gray-500">Registered Clients</p>
+                                <p class="text-sm text-gray-500">Clients</p>
                                 <h3 class="text-2xl font-bold text-purple-800">89</h3>
                             </div>
                             <div class="p-3 rounded-full bg-purple-100 text-purple-600">
