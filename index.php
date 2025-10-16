@@ -6,109 +6,96 @@ $error = '';
 $success = '';
 
 try {
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    // Vérifie s'il y a déjà des utilisateurs
+    $stmt = $pdo->query("SELECT COUNT(*) as total FROM inscription");
+    $count = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
-    // 🔹 Vérifie s’il y a déjà des utilisateurs
-    $checkUsers = $pdo->query("SELECT COUNT(*) FROM inscription");
-    $userCount = $checkUsers->fetchColumn();
-
-    // 🔹 Si aucun utilisateur, on crée un compte administrateur par défaut
-    if ($userCount == 0) {
-        $defaultPassword = password_hash("admin123", PASSWORD_DEFAULT);
-        $stmt = $pdo->prepare("INSERT INTO inscription (nom, prenom, email, mdp, role) VALUES (?, ?, ?, ?, ?)");
-        $stmt->execute(["Admin", "Principal", "admin@chambrefroide.com", $defaultPassword, "admin"]);
+    // Si aucun utilisateur, créer un admin par défaut
+    if ($count == 0) {
+        $default_email = "admin@coldmanager.com";
+        $default_pass = password_hash("admin123", PASSWORD_DEFAULT);
+        $pdo->prepare("INSERT INTO inscription (nom, prenom, email, mdp, role) VALUES (?, ?, ?, ?, ?)")
+            ->execute(["Admin", "Principal", $default_email, $default_pass, "admin"]);
     }
-
 } catch (PDOException $e) {
-    die("Erreur de connexion : " . $e->getMessage());
+    die("Erreur initiale : " . $e->getMessage());
 }
 
-# ============================
-# 🔹 Connexion utilisateur
-# ============================
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['login'])) {
-    $email = trim($_POST['email']);
-    $password = $_POST['mdp']; // correspond à la colonne 'mdp' en base
-    
-    if (empty($email) || empty($password)) {
-        $error = "Veuillez remplir tous les champs";
-    } else {
-        try {
-            $stmt = $pdo->prepare("SELECT * FROM inscription WHERE email = ?");
-            $stmt->execute([$email]);
-            $user = $stmt->fetch(PDO::FETCH_ASSOC);
-            
-            if ($user && password_verify($password, $user['mdp'])) {
-                $_SESSION['user_email'] = $user['email'];
-                $_SESSION['user_nom'] = $user['nom'];
-                $_SESSION['user_prenom'] = $user['prenom'];
-                $_SESSION['user_role'] = $user['role'];
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-                // 🔹 Redirection selon le rôle
-                if ($user['role'] === 'admin') {
-                    header('Location: DASHBOARD/dashboard.php');
+    // === CONNEXION ===
+    if (isset($_POST['login'])) {
+        $email = trim($_POST['email']);
+        $password = $_POST['mdp'];
+
+        if (empty($email) || empty($password)) {
+            $error = "Veuillez remplir tous les champs";
+        } else {
+            try {
+                $stmt = $pdo->prepare("SELECT * FROM inscription WHERE email = ?");
+                $stmt->execute([$email]);
+                $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                if ($user && password_verify($password, $user['mdp'])) {
+                    $_SESSION['user_id'] = $user['id'];
+                    $_SESSION['user_email'] = $user['email'];
+                    $_SESSION['user_nom'] = $user['nom'];
+                    $_SESSION['user_prenom'] = $user['prenom'];
+                    $_SESSION['user_role'] = $user['role'];
+
+                    if ($user['role'] == 'admin') {
+                        header('Location: dashboard.php');
+                    } else {
+                        header('Location: produits.php');
+                    }
+                    exit();
                 } else {
-                    header('Location: DASHBOARD/produits.php');
+                    $error = "Email ou mot de passe incorrect";
                 }
-                exit();
-            } else {
-                $error = "Email ou mot de passe incorrect.";
+            } catch (PDOException $e) {
+                $error = "Erreur de connexion: " . $e->getMessage();
             }
-            
-        } catch (PDOException $e) {
-            $error = "Erreur SQL: " . $e->getMessage();
         }
     }
-}
 
-# ============================
-# 🔹 Inscription utilisateur
-# ============================
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['register'])) {
-    $nom = trim($_POST['nom']);
-    $prenom = trim($_POST['prenom']);
-    $email = trim($_POST['email']);
-    $password = $_POST['password'];
-    
-    if (empty($nom) || empty($prenom) || empty($email) || empty($password)) {
-        $error = "Tous les champs doivent être remplis";
-    } else {
-        try {
-            $stmt = $pdo->prepare("SELECT id FROM inscription WHERE email = ?");
-            $stmt->execute([$email]);
-            
-            if ($stmt->fetch()) {
-                $error = "Cet email est déjà utilisé";
-            } else {
-                $mdp_hashed = password_hash($password, PASSWORD_DEFAULT);
-                $stmt = $pdo->prepare("INSERT INTO inscription (nom, prenom, email, mdp, role) VALUES (?, ?, ?, ?, 'user')");
-                
-                if ($stmt->execute([$nom, $prenom, $email, $mdp_hashed])) {
-                    $success = "Inscription réussie ! Vous pouvez maintenant vous connecter.";
+    // === INSCRIPTION ===
+    if (isset($_POST['register'])) {
+        $nom = trim($_POST['nom']);
+        $prenom = trim($_POST['prenom']);
+        $email = trim($_POST['email']);
+        $password = $_POST['password'];
+
+        if (empty($nom) || empty($prenom) || empty($email) || empty($password)) {
+            $error = "Tous les champs sont obligatoires";
+        } else {
+            try {
+                // Vérifier si l'email existe déjà
+                $stmt = $pdo->prepare("SELECT * FROM inscription WHERE email = ?");
+                $stmt->execute([$email]);
+                if ($stmt->fetch()) {
+                    $error = "Cet email est déjà utilisé";
                 } else {
-                    $error = "Erreur lors de l'inscription";
+                    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+                    $stmt = $pdo->prepare("INSERT INTO inscription (nom, prenom, email, mdp, role) VALUES (?, ?, ?, ?, ?)");
+                    $stmt->execute([$nom, $prenom, $email, $hashedPassword, 'user']);
+                    $success = "Inscription réussie ! Vous pouvez maintenant vous connecter.";
                 }
+            } catch (PDOException $e) {
+                $error = "Erreur d'inscription : " . $e->getMessage();
             }
-            
-        } catch (PDOException $e) {
-            $error = "Erreur: " . $e->getMessage();
         }
     }
 }
 ?>
-
 
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Connexion - Chambre Froide</title>
+  <title>Connexion - Cold Manager</title>
 
-  
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-  
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
   <style>
@@ -120,7 +107,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['register'])) {
       align-items: center;
       justify-content: center;
     }
-
     .auth-container {
       background: #fff;
       border-radius: 15px;
@@ -129,18 +115,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['register'])) {
       padding: 40px;
       transition: all 0.4s ease-in-out;
     }
-
     .auth-container h2 {
       text-align: center;
       color: #0078D7;
       margin-bottom: 30px;
       font-weight: 700;
     }
-
-    .form-control {
-      border-radius: 10px;
-    }
-
     .btn-custom {
       background: linear-gradient(90deg, #0078D7, #00b894);
       border: none;
@@ -149,22 +129,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['register'])) {
       width: 100%;
       font-weight: 600;
     }
-
     .btn-custom:hover {
       opacity: 0.9;
     }
-
     .switch-link {
       text-align: center;
       margin-top: 15px;
     }
-
     .switch-link a {
       color: #0078D7;
       font-weight: 600;
       text-decoration: none;
     }
-
     .switch-link a:hover {
       text-decoration: underline;
     }
@@ -180,7 +156,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['register'])) {
       <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
     <?php endif; ?>
 
-    <?php if (!empty($success)): ?>
+    <?php if (!empty($success) && isset($_POST['login'])): ?>
       <div class="alert alert-success"><?php echo htmlspecialchars($success); ?></div>
     <?php endif; ?>
 
@@ -188,14 +164,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['register'])) {
       <input type="hidden" name="login" value="1">
       <div class="mb-3">
         <label for="email" class="form-label">Adresse e-mail</label>
-        <input type="email" class="form-control" id="email" name="email" placeholder="Entrez votre e-mail" value="<?php echo isset($_POST['email']) && isset($_POST['login']) ? htmlspecialchars($_POST['email']) : ''; ?>" required>
+        <input type="email" class="form-control" id="email" name="email" placeholder="Entrez votre e-mail" required>
       </div>
 
       <div class="mb-3">
         <label for="password" class="form-label">Mot de passe</label>
         <input type="password" class="form-control" id="password" name="mdp" placeholder="Entrez votre mot de passe" required>
-        <!-- // le nom de la colonne du mot de passe qui est mdp et non password : le name-->
-
       </div>
 
       <button type="submit" class="btn btn-custom mt-3"><i class="fa-solid fa-lock me-2"></i> Se connecter</button>
@@ -214,26 +188,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['register'])) {
       <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
     <?php endif; ?>
 
+    <?php if (!empty($success) && isset($_POST['register'])): ?>
+      <div class="alert alert-success"><?php echo htmlspecialchars($success); ?></div>
+    <?php endif; ?>
+
     <form method="POST" action="">
       <input type="hidden" name="register" value="1">
       <div class="mb-3">
         <label for="nom" class="form-label">Nom</label>
-        <input type="text" class="form-control" id="nom" name="nom" placeholder="Votre nom" value="<?php echo isset($_POST['nom']) && isset($_POST['register']) ? htmlspecialchars($_POST['nom']) : ''; ?>" required>
+        <input type="text" class="form-control" id="nom" name="nom" placeholder="Votre nom" required>
       </div>
 
       <div class="mb-3">
         <label for="prenom" class="form-label">Prénom</label>
-        <input type="text" class="form-control" id="prenom" name="prenom" placeholder="Votre prénom" value="<?php echo isset($_POST['prenom']) && isset($_POST['register']) ? htmlspecialchars($_POST['prenom']) : ''; ?>" required>
+        <input type="text" class="form-control" id="prenom" name="prenom" placeholder="Votre prénom" required>
       </div>
 
       <div class="mb-3">
         <label for="email2" class="form-label">Adresse e-mail</label>
-        <input type="email" class="form-control" id="email2" name="email" placeholder="Entrez votre e-mail" value="<?php echo isset($_POST['email']) && isset($_POST['register']) ? htmlspecialchars($_POST['email']) : ''; ?>" required>
+        <input type="email" class="form-control" id="email2" name="email" placeholder="Entrez votre e-mail" required>
       </div>
 
       <div class="mb-3">
         <label for="password2" class="form-label">Mot de passe</label>
-        <input type="password" class="form-control" id="password2" name="password" placeholder="Créez un mot de passe" required> 
+        <input type="password" class="form-control" id="password2" name="password" placeholder="Créez un mot de passe" required>
       </div>
 
       <button type="submit" class="btn btn-custom mt-3"><i class="fa-solid fa-user-check me-2"></i> S'inscrire</button>
@@ -243,8 +221,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['register'])) {
       <p>Déjà inscrit ? <a href="#" onclick="toggleForms()">Connectez-vous</a></p>
     </div>
   </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
     function toggleForms() {
