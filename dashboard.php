@@ -1,319 +1,269 @@
-
 <?php
 session_start();
-include "../config.php";
 if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'admin') {
     header('Location: ../index.php');
     exit();
 }
 ?>
+
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Admin - ColdManager</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <title>FrostyStock Pro - Cold Storage Management</title>
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body {
-            background-color: #f8f9fa;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
         .sidebar {
-            background: linear-gradient(135deg, #0078D7, #00b894);
-            color: white;
-            min-height: 100vh;
-            box-shadow: 3px 0 10px rgba(0,0,0,0.1);
+            background: linear-gradient(135deg, #e6f7ff 0%, #b3e0ff 100%);
         }
-        .sidebar .nav-link {
-            color: white;
-            padding: 15px 20px;
-            margin: 5px 0;
-            border-radius: 8px;
-            transition: all 0.3s;
+        .frosty-bg {
+            background-color: #f0f9ff;
         }
-        .sidebar .nav-link:hover {
-            background-color: rgba(255,255,255,0.2);
-            transform: translateX(5px);
+        .alert-bubble {
+            animation: pulse 2s infinite;
         }
-        .sidebar .nav-link.active {
-            background-color: rgba(255,255,255,0.3);
-            font-weight: bold;
-        }
-        .main-content {
-            padding: 30px;
-        }
-        .welcome-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-        .stat-card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-            transition: transform 0.3s;
-            border-left: 4px solid #0078D7;
-        }
-        .stat-card:hover {
-            transform: translateY(-5px);
-        }
-        .admin-avatar {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #0078D7, #00b894);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            color: white;
-            margin: 0 auto;
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
     </style>
 </head>
-<body>
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <nav class="col-md-3 col-lg-2 sidebar">
-                <div class="position-sticky pt-4">
-                    <!-- Admin Info -->
-                    <div class="text-center mb-4">
-                        <div class="admin-avatar mb-3">
-                            <i class="fas fa-crown"></i>
-                        </div>
-                        <h5>ADMIN Admin</h5>
-                        <p class="text-light">Administrateur</p>
-                        <small>admin@gmail.com</small>
-                    </div>
+<body class="frosty-bg">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="sidebar w-64 shadow-lg flex flex-col">
+            <div class="p-4 text-center border-b border-blue-200">
+                <h1 class="text-2xl font-bold text-blue-800 flex items-center justify-center">
+                    <i data-feather="wind" class="mr-2"></i> Cold Manager
+                </h1>
+            </div>
+            
+            <div class="p-4 flex-1">
+             
 
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link active" href="dashboard.php">
-                                <i class="fas fa-tachometer-alt me-2"></i>
-                                Tableau de Bord
+                <nav>
+                    <ul class="space-y-1">
+                        <li>
+                            <a href="#" class="flex items-center px-4 py-2 text-blue-900 bg-blue-100 rounded-lg">
+                                <i data-feather="home" class="mr-2"></i> Dashboard
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="produits.php">
-                                <i class="fas fa-box me-2"></i>
-                                Gestion des Produits
+                        <li>
+                            <a href="#" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                <i data-feather="users" class="mr-2"></i> Employes
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="utilisateurs.php">
-                                <i class="fas fa-users me-2"></i>
-                                Gestion des Utilisateurs
+                        <li>
+                            <a href="#" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                <i data-feather="shopping-bag" class="mr-2"></i> Clients
                             </a>
                         </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link" href="utilisateurs.php">
-                                <i class="fas fa-users me-2"></i>
-                                Liste des achats
+                        <li>
+                            <a href="#" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                <i data-feather="package" class="mr-2"></i> Produits
                             </a>
                         </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link" href="rapports.php">
-                                <i class="fas fa-chart-bar me-2"></i>
-                                Rapports
+                        <li>
+                            <a href="#" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                <i data-feather="dollar-sign" class="mr-2"></i> Sales
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="parametres.php">
-                                <i class="fas fa-cogs me-2"></i>
-                                Paramètres
+                        <li>
+                            <a href="#" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                <i data-feather="file-text" class="mr-2"></i> Invoices
                             </a>
                         </li>
-                        <li class="nav-item mt-4">
-                            <a class="nav-link text-warning" href="../deconnexion.php">
-                                <i class="fas fa-sign-out-alt me-2"></i>
-                                Déconnexion
+                        <li>
+                            <a href="#" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                <i data-feather="bell" class="mr-2"></i> Alerts
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                <i data-feather="bar-chart-2" class="mr-2"></i> Statistics
                             </a>
                         </li>
                     </ul>
-                </div>
-            </nav>
+                </nav>
+            </div>
 
-            <!-- Main Content -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 main-content">
-                <!-- Welcome Card -->
-                <div class="row mb-4">
-                    <div class="col-12">
-                        <div class="card welcome-card">
-                            <div class="card-body">
-                                <div class="row align-items-center">
-                                    <div class="col-md-8">
-                                        <h2 class="card-title">Bonjour, HOUNDJO Sylvia ! </h2>
-                                        <p class="card-text">Bienvenue dans votre espace d'administration ColdManager.</p>
-                                        <p class="card-text">Vous avez un accès complet à toutes les fonctionnalités du système.</p>
-                                    </div>
-                                    <div class="col-md-4 text-center">
-                                        <i class="fas fa-shield-alt fa-5x opacity-75"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="p-4 border-t border-blue-200">
+                <a href="../deconnexion.php" class="flex items-center btn btn-primary px-4 py-2 text-white-600 hover:bg-red-50 rounded-lg">
+                    <i class="mr-2"></i> <b>Deconnexion</b>
+                </a>
+            </div>
+        </div>
 
-                <!-- Statistics Cards -->
-                <div class="row">
-                    <div class="col-md-3 mb-4">
-                        <div class="card stat-card">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between">
-                                    <div>
-                                        <h3 class="text-primary">156</h3>
-                                        <p class="text-muted">Produits Total</p>
-                                    </div>
-                                    <div class="align-self-center">
-                                        <i class="fas fa-boxes text-primary fa-2x"></i>
-                                    </div>
-                                </div>
+        <!-- Main Content -->
+        <div class="flex-1 overflow-auto">
+            <!-- Top Bar -->
+            <header class="bg-white shadow-sm p-4 flex justify-between items-center">
+                <h2 class="text-xl font-semibold text-blue-800">
+                    <i data-feather="home" class="inline mr-2"></i> Dashboard
+                </h2>
+                
+                <div class="flex items-center space-x-4">
+                    <div class="relative">
+                        <i data-feather="bell" class="text-blue-600"></i>
+                        <span class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center alert-bubble">3</span>
+                    </div>
+                    <div class="w-8 h-8 rounded-full bg-blue-100 overflow-hidden">
+                        <img src="http://static.photos/blue/200x200/42" class="w-full h-full object-cover">
+                    </div>
+                    <b>
+                                <?php echo $_SESSION['user_nom'] . ' ' . $_SESSION['user_prenom']; ?>
+
+                            </b>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <main class="p-6">
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white rounded-lg shadow p-6 border-l-4 border-blue-500">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-sm text-gray-500">Total Products</p>
+                                <h3 class="text-2xl font-bold text-blue-800">1,245</h3>
+                            </div>
+                            <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                                <i data-feather="package"></i>
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="col-md-3 mb-4">
-                        <div class="card stat-card">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between">
-                                    <div>
-                                        <h3 class="text-success">24</h3>
-                                        <p class="text-muted">Utilisateurs</p>
-                                    </div>
-                                    <div class="align-self-center">
-                                        <i class="fas fa-users text-success fa-2x"></i>
-                                    </div>
-                                </div>
+
+                    <div class="bg-white rounded-lg shadow p-6 border-l-4 border-red-500">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-sm text-gray-500">Expired Products</p>
+                                <h3 class="text-2xl font-bold text-red-800">23</h3>
+                            </div>
+                            <div class="p-3 rounded-full bg-red-100 text-red-600">
+                                <i data-feather="alert-circle"></i>
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="col-md-3 mb-4">
-                        <div class="card stat-card">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between">
-                                    <div>
-                                        <h3 class="text-warning">8</h3>
-                                        <p class="text-muted">Produits Expirés</p>
-                                    </div>
-                                    <div class="align-self-center">
-                                        <i class="fas fa-exclamation-triangle text-warning fa-2x"></i>
-                                    </div>
-                                </div>
+
+                    <div class="bg-white rounded-lg shadow p-6 border-l-4 border-green-500">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-sm text-gray-500">Total Sales</p>
+                                <h3 class="text-2xl font-bold text-green-800">$42,567</h3>
+                            </div>
+                            <div class="p-3 rounded-full bg-green-100 text-green-600">
+                                <i data-feather="dollar-sign"></i>
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="col-md-3 mb-4">
-                        <div class="card stat-card">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between">
-                                    <div>
-                                        <h3 class="text-info">12</h3>
-                                        <p class="text-muted">Bientôt Expirés</p>
-                                    </div>
-                                    <div class="align-self-center">
-                                        <i class="fas fa-clock text-info fa-2x"></i>
-                                    </div>
-                                </div>
+
+                    <div class="bg-white rounded-lg shadow p-6 border-l-4 border-purple-500">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-sm text-gray-500">Registered Clients</p>
+                                <h3 class="text-2xl font-bold text-purple-800">89</h3>
+                            </div>
+                            <div class="p-3 rounded-full bg-purple-100 text-purple-600">
+                                <i data-feather="users"></i>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Quick Actions -->
-                <div class="row mt-4">
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-header bg-primary text-white">
-                                <h5 class="mb-0">
-                                    <i class="fas fa-bolt me-2"></i>
-                                    Actions Rapides
-                                </h5>
+                <!-- Charts Section -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-semibold text-blue-800">Sales Overview</h3>
+                            <div class="flex space-x-2">
+                                <button class="px-3 py-1 text-xs bg-blue-100 text-blue-800 rounded">Week</button>
+                                <button class="px-3 py-1 text-xs bg-white text-gray-600 rounded">Month</button>
+                                <button class="px-3 py-1 text-xs bg-white text-gray-600 rounded">Year</button>
                             </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-3 text-center mb-3">
-                                        <a href="ajt_pdt.php" class="btn btn-outline-primary btn-lg p-3 w-100">
-                                            <i class="fas fa-plus-circle fa-2x mb-2"></i><br>
-                                            Ajouter Produit
-                                        </a>
-                                    </div>
-                                    <div class="col-md-3 text-center mb-3">
-                                        <a href="produits.php" class="btn btn-outline-success btn-lg p-3 w-100">
-                                            <i class="fas fa-list fa-2x mb-2"></i><br>
-                                            Voir Produits
-                                        </a>
-                                    </div>
-                                    <div class="col-md-3 text-center mb-3">
-                                        <a href="utilisateurs.php" class="btn btn-outline-info btn-lg p-3 w-100">
-                                            <i class="fas fa-user-plus fa-2x mb-2"></i><br>
-                                            Gérer Utilisateurs
-                                        </a>
-                                    </div>
-                                    <div class="col-md-3 text-center mb-3">
-                                        <a href="rapports.php" class="btn btn-outline-warning btn-lg p-3 w-100">
-                                            <i class="fas fa-chart-pie fa-2x mb-2"></i><br>
-                                            Voir Rapports
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
+                        </div>
+                        <div class="h-64 bg-gray-50 rounded flex items-center justify-center">
+                            <p class="text-gray-400">Chart will be rendered here</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-semibold text-blue-800">Product Categories</h3>
+                            <i data-feather="more-horizontal" class="text-gray-400"></i>
+                        </div>
+                        <div class="h-64 bg-gray-50 rounded flex items-center justify-center">
+                            <p class="text-gray-400">Pie chart will be rendered here</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Recent Activity -->
-                <div class="row mt-4">
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-header bg-info text-white">
-                                <h5 class="mb-0">
-                                    <i class="fas fa-history me-2"></i>
-                                    Activité Récente
-                                </h5>
+                <!-- Recent Alerts -->
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <div class="p-4 border-b border-gray-200">
+                        <h3 class="font-semibold text-blue-800 flex items-center">
+                            <i data-feather="bell" class="mr-2"></i> Recent Alerts
+                        </h3>
+                    </div>
+                    <div class="divide-y divide-gray-200">
+                        <div class="p-4 hover:bg-blue-50 flex items-start">
+                            <div class="p-2 rounded-full bg-red-100 text-red-600 mr-3">
+                                <i data-feather="alert-triangle" class="w-4 h-4"></i>
                             </div>
-                            <div class="card-body">
-                                <div class="list-group">
-                                    <div class="list-group-item">
-                                        <div class="d-flex w-100 justify-content-between">
-                                            <h6 class="mb-1">Nouveau produit ajouté</h6>
-                                            <small>Il y a 5 minutes</small>
-                                        </div>
-                                        <p class="mb-1">Poisson frais - Catégorie Poissons</p>
-                                    </div>
-                                    <div class="list-group-item">
-                                        <div class="d-flex w-100 justify-content-between">
-                                            <h6 class="mb-1">Utilisateur connecté</h6>
-                                            <small>Il y a 15 minutes</small>
-                                        </div>
-                                        <p class="mb-1">Jean Dupont s'est connecté</p>
-                                    </div>
-                                    <div class="list-group-item">
-                                        <div class="d-flex w-100 justify-content-between">
-                                            <h6 class="mb-1">Produit supprimé</h6>
-                                            <small>Il y a 1 heure</small>
-                                        </div>
-                                        <p class="mb-1">Viande expirée supprimée</p>
-                                    </div>
-                                </div>
+                            <div>
+                                <p class="font-medium">12 products will expire tomorrow!</p>
+                                <p class="text-sm text-gray-500">Meat category - Cold Room A</p>
                             </div>
+                            <div class="ml-auto text-sm text-gray-500">2h ago</div>
                         </div>
+                        <div class="p-4 hover:bg-blue-50 flex items-start">
+                            <div class="p-2 rounded-full bg-orange-100 text-orange-600 mr-3">
+                                <i data-feather="alert-circle" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium">Low stock for dairy products</p>
+                                <p class="text-sm text-gray-500">Only 5 units remaining</p>
+                            </div>
+                            <div class="ml-auto text-sm text-gray-500">5h ago</div>
+                        </div>
+                        <div class="p-4 hover:bg-blue-50 flex items-start">
+                            <div class="p-2 rounded-full bg-yellow-100 text-yellow-600 mr-3">
+                                <i data-feather="clock" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium">Temperature alert in Cold Room B</p>
+                                <p class="text-sm text-gray-500">Temperature rose to 5°C</p>
+                            </div>
+                            <div class="ml-auto text-sm text-gray-500">1d ago</div>
+                        </div>
+                    </div>
+                    <div class="p-3 bg-gray-50 text-center">
+                        <a href="#" class="text-sm text-blue-600 hover:underline">View all alerts</a>
                     </div>
                 </div>
             </main>
         </div>
     </div>
 
-    <!-- Scripts -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        feather.replace();
+        
+        // Simple animation for stats cards
+        document.querySelectorAll('.bg-white').forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = `all 0.3s ease ${index * 0.1}s`;
+            
+            setTimeout(() => {
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, 100);
+        });
+    </script>
 </body>
 </html>
