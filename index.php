@@ -15,7 +15,7 @@ try {
         $default_email = "admin@coldmanager.com";
         $default_pass = password_hash("admin123", PASSWORD_DEFAULT);
         $pdo->prepare("INSERT INTO inscription (nom, prenom, email, mdp, role) VALUES (?, ?, ?, ?, ?)")
-            ->execute(["Admin", "Principal", $default_email, $default_pass, "admin"]);
+            ->execute(["HOUNDJO", "Sylvia", $default_email, $default_pass, "admin"]);
     }
 } catch (PDOException $e) {
     die("Erreur initiale : " . $e->getMessage());
@@ -41,14 +41,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $_SESSION['user_email'] = $user['email'];
                     $_SESSION['user_nom'] = $user['nom'];
                     $_SESSION['user_prenom'] = $user['prenom'];
-                    $_SESSION['user_role'] = $user['role'];
+                    $_SESSION['role'] = $user['role'];
 
-                    if ($user['role'] == 'admin') {
-                        header('Location: dashboard.php');
-                    } else {
-                        header('Location: produits.php');
-                    }
-                    exit();
+                    header('Location: dashboard.php');
+                   
                 } else {
                     $error = "Email ou mot de passe incorrect";
                 }
