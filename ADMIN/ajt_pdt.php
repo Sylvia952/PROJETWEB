@@ -55,7 +55,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 <body>
 
-<div class="container mt-5">
+<div  class="bg-primary">
     <h2 class="text-center">Ajouter un Produit</h2>
 
     <?php if (!empty($error)): ?>

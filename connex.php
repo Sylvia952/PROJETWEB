@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $_SESSION['user_prenom'] = $user['prenom'];
                     
                     // Redirection vers le dashboard
-                    header('Location: dashboard.html.php');
+                    header('Location: dashboard.php');
                     exit();
                 } else {
                     $error = "Email ou mot de passe incorrect";

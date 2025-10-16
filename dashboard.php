@@ -1,23 +1,7 @@
-# PROJETWEB
-REMARQUES ET RECOMMANDATIONS
-
-- il faut toujours avoir un fichier index qui demarre le projet 
-pourquoi ? 
-
-parceque: Le fichier index est le point d’entrée principal d’un site web
-
-- ajouter ne marche pas  
-- pour tous projet en ce qui concerce les fonctionnalités , il faut avoir l'habitude de commencer par l'authentification(inscription et connexion)
-
-- tu peux faire la mise en forme de index.php comme ca te plait , moi j'ai juste faire quelque chose 
-
-
-
-
-
 
 <?php
 session_start();
+include "../config.php";
 if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'admin') {
     header('Location: ../index.php');
     exit();
@@ -101,9 +85,9 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'admin') {
                         <div class="admin-avatar mb-3">
                             <i class="fas fa-crown"></i>
                         </div>
-                        <h5>HOUNDJO Sylvia</h5>
+                        <h5>ADMIN Admin</h5>
                         <p class="text-light">Administrateur</p>
-                        <small>sylviahoundjo9@gmail.com</small>
+                        <small>admin@gmail.com</small>
                     </div>
 
                     <ul class="nav flex-column">
@@ -125,6 +109,14 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'admin') {
                                 Gestion des Utilisateurs
                             </a>
                         </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="utilisateurs.php">
+                                <i class="fas fa-users me-2"></i>
+                                Liste des achats
+                            </a>
+                        </li>
+
                         <li class="nav-item">
                             <a class="nav-link" href="rapports.php">
                                 <i class="fas fa-chart-bar me-2"></i>
@@ -156,7 +148,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'admin') {
                             <div class="card-body">
                                 <div class="row align-items-center">
                                     <div class="col-md-8">
-                                        <h2 class="card-title">Bonjour, HOUNDJO Sylvia ! 👑</h2>
+                                        <h2 class="card-title">Bonjour, HOUNDJO Sylvia ! </h2>
                                         <p class="card-text">Bienvenue dans votre espace d'administration ColdManager.</p>
                                         <p class="card-text">Vous avez un accès complet à toutes les fonctionnalités du système.</p>
                                     </div>
@@ -325,370 +317,3 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'admin') {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-<?php
-session_start();
-if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'admin') {
-    header('Location: ../index.php');
-    exit();
-}
-?>
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Dashboard Admin</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-   <!DOCTYPE html>
-<html>
-<head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="stylesheet" type="text/css" href="../cssjs/css/dashboard.css">
-	<link rel="stylesheet" type="text/css" href="../cssjs/css/responsive.css">
-	<link rel="stylesheet" type="text/css" href="../cssjs/css/bootstrap.min.css">
-	<link rel="stylesheet" type="text/css" href="../cssjs/css/bootstrap.css">
-	<link rel="stylesheet" type="text/css" href="../cssjs/font/all.min.css">
-	<link rel="stylesheet" type="text/css" href="../cssjs/font/fontawesome.min.css">
-	<title></title>
-</head>
-<body>
-
-	<div class="navigation_phone">
-		<div class="logo">
-			<h5>COLDMANAGER</h5>
-
-			<div class="btn_menu">
-				<i class="fas fa-times"></i>
-			</div>
-		</div>
-
-		<div class="link_content_phone">
-			<a href="" class="active">
-				<i class="fas fa-tachometer-alt"></i>
-				<h4>Tableau de bord</h4>
-			</a>
-
-			<a href="">
-				<i class="far fa-user"></i>
-				<h4>Produits</h4>
-			</a>
-
-			<a href="commande/commande.html">
-				<i class="fas fa-cart-arrow-down"></i>
-				<h4>Ventes</h4>
-			</a>
-
-			<a href="">
-				<i class="fas fa-chart-bar"></i>
-				<h4>Statistques</h4>
-			</a>
-
-			<a href="">
-				<i class="fas fa-cog"></i>
-				<h4>Reglage</h4>
-			</a>
-		</div>
-
-		<a href="" class="log_out">
-			<i class="fas fa-sign-out-alt"></i>
-			<h3>Déconnexion</h3>
-		</a>
-	</div>
-
-</body>
-</html>
-
-
-
-
-
-
-
-
-
-
-index.php
-<?php
-include "config.php"; 
-session_start();
-
-// Vérifier si l'utilisateur est déjà connecté
-if (isset($_SESSION['connex_id'])) {
-    // Redirection selon le type d'utilisateur
-    if ($_SESSION['user_type'] == 'admin') {
-        header('Location: dashboard.php');
-    } else {
-        header('Location: produits.php');
-    }
-    exit();
-}
-
-// Traitement du formulaire de connexion
-$error = '';
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $email = trim($_POST['email']);
-    $password = $_POST['mdp']; // Correction : mdp au lieu de password
-    
-    // Validation des champs
-    if (empty($email) || empty($password)) {
-        $error = "Veuillez remplir tous les champs";
-    } else {
-        try {
-            // Connexion à la base de données
-            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            
-            // Rechercher l'utilisateur par email dans la table INSCRIPTION
-            $stmt = $pdo->prepare("SELECT id, nom, prenom, email, mdp, type_utilisateur FROM inscription WHERE email = ?");
-            $stmt->execute([$email]);
-            $user = $stmt->fetch(PDO::FETCH_ASSOC);
-            
-            if ($user) {
-                // Vérifier le mot de passe
-                if (password_verify($password, $user['mdp'])) {
-                    // Connexion réussie
-                    $_SESSION['connex_id'] = $user['id'];
-                    $_SESSION['user_email'] = $user['email'];
-                    $_SESSION['user_nom'] = $user['nom'];
-                    $_SESSION['user_prenom'] = $user['prenom'];
-                    $_SESSION['user_type'] = $user['type_utilisateur']; // Stocker le type d'utilisateur
-                    
-                    // Redirection selon le type d'utilisateur
-                    if ($user['type_utilisateur'] == 'admin') {
-                        header('Location: dashboard.php');
-                    } else {
-                        header('Location: produits.php');
-                    }
-                    exit();
-                } else {
-                    $error = "Email ou mot de passe incorrect";
-                }
-            } else {
-                $error = "Email ou mot de passe incorrect";
-            }
-        } catch (PDOException $e) {
-            $error = "Erreur de connexion: " . $e->getMessage();
-        }
-    }
-}
-?>
-
-
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Connexion - Chambre Froide</title>
-
-  
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-  
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-  <style>
-    body {
-      background: linear-gradient(120deg, #0078D7, #00b894);
-      font-family: 'Segoe UI', sans-serif;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .auth-container {
-      background: #fff;
-      border-radius: 15px;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.15);
-      width: 400px;
-      padding: 40px;
-      transition: all 0.4s ease-in-out;
-    }
-
-    .auth-container h2 {
-      text-align: center;
-      color: #0078D7;
-      margin-bottom: 30px;
-      font-weight: 700;
-    }
-
-    .form-control {
-      border-radius: 10px;
-    }
-
-    .btn-custom {
-      background: linear-gradient(90deg, #0078D7, #00b894);
-      border: none;
-      color: #fff;
-      border-radius: 10px;
-      width: 100%;
-      font-weight: 600;
-    }
-
-    .btn-custom:hover {
-      opacity: 0.9;
-    }
-
-    .switch-link {
-      text-align: center;
-      margin-top: 15px;
-    }
-
-    .switch-link a {
-      color: #0078D7;
-      font-weight: 600;
-      text-decoration: none;
-    }
-
-    .switch-link a:hover {
-      text-decoration: underline;
-    }
-  </style>
-</head>
-<body>
-
-  <!-- ======== Connexion ======== -->
-  <div class="auth-container" id="loginForm">
-    <h2><i class="fa-solid fa-right-to-bracket me-2"></i>Connexion</h2>
-
-    <?php if (!empty($error)): ?>
-      <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
-    <?php endif; ?>
-
-    <?php if (!empty($success)): ?>
-      <div class="alert alert-success"><?php echo htmlspecialchars($success); ?></div>
-    <?php endif; ?>
-
-    <form method="POST" action="">
-      <div class="mb-3">
-        <label for="email" class="form-label">Adresse e-mail</label>
-        <input type="email" class="form-control" id="email" name="email" placeholder="Entrez votre e-mail" value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>" required>
-      </div>
-
-      <div class="mb-3">
-        <label for="password" class="form-label">Mot de passe</label>
-        <input type="password" class="form-control" id="password" name="mdp" placeholder="Entrez votre mot de passe" required>
-      </div>
-
-      <button type="submit" class="btn btn-custom mt-3"><i class="fa-solid fa-lock me-2"></i> Se connecter</button>
-    </form>
-
-    <div class="switch-link">
-      <p>Pas encore de compte ? <a href="#" onclick="toggleForms()">Inscrivez-vous</a></p>
-    </div>
-  </div>
-
-
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-  <script>
-    function toggleForms() {
-      document.getElementById('loginForm').classList.toggle('d-none');
-      document.getElementById('registerForm').classList.toggle('d-none');
-    }
-  </script>
-</body>
-</html>
-
-
-
-
-
-
-
-
-inscription.php
-
-
-<?php
-include "config.php"; 
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if (
-        isset($_POST['nom'], $_POST['prenom'], $_POST['email'], $_POST['mdp']) &&
-        !empty($_POST['nom']) && !empty($_POST['prenom']) &&
-         !empty($_POST['email']) && !empty($_POST['mdp'])
-    ) {
-        $nom = trim($_POST['nom']);
-        $prenom = trim($_POST['prenom']);
-        $email = trim($_POST['email']);
-        $mdp = password_hash($_POST['mdp'], PASSWORD_DEFAULT); 
-        // die("Récupération");
-
-        $stmt = $pdo->prepare("INSERT INTO inscription (nom, prenom, email, mdp) VALUES (?, ?, ?, ?)");
-
-
-        if ($stmt->execute([$nom, $prenom, $email, $mdp])) {
-
-            $id_inscription = $pdo->lastInsertId();
-
-        
-            header("Location: index.php?id_inscription=" . $id_inscription);
-            exit();
-        } else {
-            echo "Erreur lors de l'insertion.";
-        }
-    } else {
-        echo "Tous les champs doivent être remplis.";
-    }
-}
-?>
-
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>INSCRIPTION</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-
-<div class="container mt-5">
-    <h2 class="text-center">S'INSCRIRE</h2>
-
-    <form method="POST" class="mt-4">
-        <div class="form-group">
-            <label for="nom">Nom</label>
-            <input type="text" class="form-control" name="nom" id="nom" placeholder="Nom" required>
-        </div>
-
-        <div class="form-group">
-            <label for="prenom">Prénom</label>
-            <input type="text" class="form-control" name="prenom" id="prenom" placeholder="Prénom" required>
-        </div>
-
-
-        <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" class="form-control" name="email" id="email" placeholder="Email" required>
-        </div>
-
-        <div class="form-group">
-            <label for="mdp">Mot de passe</label>
-            <input type="password" class="form-control" name="mdp" id="mdp" placeholder="Mot de passe" required>
-        </div>
-
-        <button type="submit" class="btn btn-primary btn-block">INSCRIPTION</button>
-    </form>
-</div>
-
-<!-- Ajouter les scripts de Bootstrap -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
-
-</body>
-</html>
-
-
