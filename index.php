@@ -5,46 +5,96 @@ include "config.php";
 $error = '';
 $success = '';
 
+try {
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    // 🔹 Vérifie s’il y a déjà des utilisateurs
+    $checkUsers = $pdo->query("SELECT COUNT(*) FROM inscription");
+    $userCount = $checkUsers->fetchColumn();
+
+    // 🔹 Si aucun utilisateur, on crée un compte administrateur par défaut
+    if ($userCount == 0) {
+        $defaultPassword = password_hash("admin123", PASSWORD_DEFAULT);
+        $stmt = $pdo->prepare("INSERT INTO inscription (nom, prenom, email, mdp, role) VALUES (?, ?, ?, ?, ?)");
+        $stmt->execute(["Admin", "Principal", "admin@chambrefroide.com", $defaultPassword, "admin"]);
+    }
+
+} catch (PDOException $e) {
+    die("Erreur de connexion : " . $e->getMessage());
+}
+
+# ============================
+# 🔹 Connexion utilisateur
+# ============================
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['login'])) {
     $email = trim($_POST['email']);
-    $password = $_POST['mdp'];
+    $password = $_POST['mdp']; // correspond à la colonne 'mdp' en base
     
     if (empty($email) || empty($password)) {
         $error = "Veuillez remplir tous les champs";
     } else {
         try {
-            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            
             $stmt = $pdo->prepare("SELECT * FROM inscription WHERE email = ?");
             $stmt->execute([$email]);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
             
             if ($user && password_verify($password, $user['mdp'])) {
-                
-                $_SESSION['user_id'] = $user['id'];
                 $_SESSION['user_email'] = $user['email'];
                 $_SESSION['user_nom'] = $user['nom'];
                 $_SESSION['user_prenom'] = $user['prenom'];
                 $_SESSION['user_role'] = $user['role'];
-                
-                
-                if ($user['role'] == 'admin') {
+
+                // 🔹 Redirection selon le rôle
+                if ($user['role'] === 'admin') {
                     header('Location: DASHBOARD/dashboard.php');
                 } else {
                     header('Location: DASHBOARD/produits.php');
                 }
                 exit();
             } else {
-                $error = "Email ou mot de passe incorrect";
+                $error = "Email ou mot de passe incorrect.";
             }
             
         } catch (PDOException $e) {
-            $error = "Erreur de connexion: " . $e->getMessage();
+            $error = "Erreur SQL: " . $e->getMessage();
         }
     }
 }
 
-
+# ============================
+# 🔹 Inscription utilisateur
+# ============================
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['register'])) {
+    $nom = trim($_POST['nom']);
+    $prenom = trim($_POST['prenom']);
+    $email = trim($_POST['email']);
+    $password = $_POST['password'];
+    
+    if (empty($nom) || empty($prenom) || empty($email) || empty($password)) {
+        $error = "Tous les champs doivent être remplis";
+    } else {
+        try {
+            $stmt = $pdo->prepare("SELECT id FROM inscription WHERE email = ?");
+            $stmt->execute([$email]);
+            
+            if ($stmt->fetch()) {
+                $error = "Cet email est déjà utilisé";
+            } else {
+                $mdp_hashed = password_hash($password, PASSWORD_DEFAULT);
+                $stmt = $pdo->prepare("INSERT INTO inscription (nom, prenom, email, mdp, role) VALUES (?, ?, ?, ?, 'user')");
+                
+                if ($stmt->execute([$nom, $prenom, $email, $mdp_hashed])) {
+                    $success = "Inscription réussie ! Vous pouvez maintenant vous connecter.";
+                } else {
+                    $error = "Erreur lors de l'inscription";
+                }
+            }
+            
+        } catch (PDOException $e) {
+            $error = "Erreur: " . $e->getMessage();
+        }
+    }
+}
 ?>
 
 

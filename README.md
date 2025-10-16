@@ -12,7 +12,124 @@ parceque: Le fichier index est le point d’entrée principal d’un site web
 - tu peux faire la mise en forme de index.php comme ca te plait , moi j'ai juste faire quelque chose 
 
 
+🧊 Projet : Cold Manager
+Objectif :
 
+Concevoir et développer une plateforme web de gestion d’une chambre froide de l’entreprise.
+Cette plateforme vise à centraliser les informations relatives aux employés, clients, produits, ventes et stocks, tout en offrant une interface intuitive, responsive et accessible depuis n’importe quel navigateur web.
+
+Technologies choisies :
+
+HTML
+
+CSS
+
+JavaScript
+
+Bootstrap
+
+PHP
+
+MySQL
+
+GitHub
+
+⚙️ Fonctionnalités du site
+Gestion des employés :
+
+Ajout
+
+Modification
+
+Suppression
+
+Liste des employés
+
+Gestion des clients :
+
+Enregistrement
+
+Consultation
+
+Édition
+
+Suppression
+
+Historique des achats
+
+Gestion des produits et stocks :
+
+Ajout
+
+Modification
+
+Alimentation
+
+Recherche
+
+Détection et suivi des expirations
+
+Gestion des ventes :
+
+Enregistrement des ventes
+
+Génération des factures
+
+Tableau de bord :
+
+Statistiques globales
+
+Vue d’ensemble des activités
+
+Authentification :
+
+Rôles, sécurité et sessions
+
+Connexion sécurisée avec identifiant et mot de passe
+
+🧑‍💼 Module Administrateur
+
+Ajouter, modifier, supprimer les employés
+
+Gestion des rôles et droits d’accès
+
+Consultation de la liste des clients
+
+Gestion de l’historique des achats
+
+Ajout, modification et suppression des produits
+
+👷 Suivi de la disponibilité des produits
+
+Alerte de stock faible
+
+Alerte de péremption
+
+Gestion des catégories de produits
+
+Suivi des paiements
+
+Statistiques des ventes
+
+👨‍🔧 Module Employés
+
+Enregistrement des clients et des achats
+
+Gestion de l’historique des achats
+
+Gestion de l’historique des produits
+
+Suivi de la disponibilité des produits
+
+Alerte de stock faible
+
+Alerte de péremption
+
+Création et gestion des factures
+
+Gestion des catégories de produits
+
+Suivi des paiements
 
 
 
