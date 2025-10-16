@@ -3,7 +3,7 @@ include "../config.php";
 session_start();
 
 if (!isset($_SESSION['connex_id'])) {
-    header('Location: ../index.php');
+    header('Location: index.php');
     exit();
 }
 

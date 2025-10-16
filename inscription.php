@@ -11,15 +11,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $prenom = trim($_POST['prenom']);
         $email = trim($_POST['email']);
         $mdp = password_hash($_POST['mdp'], PASSWORD_DEFAULT); 
+        // die("Récupération");
 
         $stmt = $pdo->prepare("INSERT INTO inscription (nom, prenom, email, mdp) VALUES (?, ?, ?, ?)");
+
 
         if ($stmt->execute([$nom, $prenom, $email, $mdp])) {
 
             $id_inscription = $pdo->lastInsertId();
 
         
-            header("Location: connex.php?id_inscription=" . $id_inscription);
+            header("Location: index.php");
             exit();
         } else {
             echo "Erreur lors de l'insertion.";
