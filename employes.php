@@ -1,10 +1,47 @@
 <?php
 session_start();
+include "config.php";
 if (!isset($_SESSION['user_id']) ) {
     header('Location: ../index.php');
     exit();
 }
+// Ajouter un employé
+if (isset($_POST['add'])) {
+    $stmt = $pdo->prepare("INSERT INTO employes (nom, prenom, email, age) VALUES (?, ?, ?, ?)");
+    $stmt->execute([$_POST['nom'], $_POST['prenom'], $_POST['email'], $_POST['age']]);
+    header("Location: employes.php");
+    exit;
+}
+
+// Modifier un employé
+if (isset($_POST['edit'])) {
+    $stmt = $pdo->prepare("UPDATE employes SET nom=?, prenom=?, email=?, age=? WHERE id=?");
+    $stmt->execute([$_POST['nom'], $_POST['prenom'], $_POST['email'], $_POST['age'], $_POST['id']]);
+    header("Location: employes.php");
+    exit;
+}
+
+// Supprimer un employé
+if (isset($_GET['delete'])) {
+    $stmt = $pdo->prepare("DELETE FROM employes WHERE id=?");
+    $stmt->execute([$_GET['delete']]);
+    header("Location: employes.php");
+    exit;
+}
+
+// Récupérer la liste des employés
+$employes = $pdo->query("SELECT * FROM employes")->fetchAll(PDO::FETCH_ASSOC);
+
+// Récupérer les données pour modification
+$editEmploye = null;
+if (isset($_GET['edit'])) {
+    $stmt = $pdo->prepare("SELECT * FROM employes WHERE id=?");
+    $stmt->execute([$_GET['edit']]);
+    $editEmploye = $stmt->fetch(PDO::FETCH_ASSOC);
+}
 ?>
+
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -73,7 +110,7 @@ if (!isset($_SESSION['user_id']) ) {
 
         <li>
             <a href="produits.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
-                <i data-feather="package" class="mr-2"></i> Produits & Stocks
+                <i data-feather="package" class="mr-2"></i> Produits
             </a>
         </li>
 
@@ -97,7 +134,7 @@ if (!isset($_SESSION['user_id']) ) {
 
         <li>
             <a href="alertes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
-                <i data-feather="bell" class="mr-2"></i> Alertes (stock / péremption)
+                <i data-feather="bell" class="mr-2"></i> Alertes 
             </a>
         </li>
 
@@ -165,7 +202,7 @@ if (!isset($_SESSION['user_id']) ) {
                 </nav>
             </div>
 
-          
+            
         </div>
 
         <!-- Main Content -->
@@ -192,129 +229,93 @@ if (!isset($_SESSION['user_id']) ) {
             </header>
 
             <!-- Dashboard Content -->
-            <main class="p-6">
-                <!-- Stats Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                    <div class="bg-white rounded-lg shadow p-6 border-l-4 border-blue-500">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <p class="text-sm text-gray-500">Total Produits</p>
-                                <h3 class="text-2xl font-bold text-blue-800">1,245</h3>
-                            </div>
-                            <div class="p-3 rounded-full bg-blue-100 text-blue-600">
-                                <i data-feather="package"></i>
-                            </div>
-                        </div>
-                    </div>
+           <main class="p-6">
+        <div class="bg-white rounded-lg shadow p-6 mb-8">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-semibold text-blue-800 text-xl">Gestion des Employés</h3>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
+                    <i class="mr-2"></i> Ajouter
+                </button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="table table-bordered w-full">
+                    <thead class="bg-blue-50">
+                        <tr>
+                            <th>Nom</th>
+                            <th>Prénom</th>
+                            <th>Email</th>
+                            <th>Âge</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <?php foreach ($employes as $emp): ?>
+                        <tr>
+                            <td><?= htmlspecialchars($emp['nom']) ?></td>
+                            <td><?= htmlspecialchars($emp['prenom']) ?></td>
+                            <td><?= htmlspecialchars($emp['email']) ?></td>
+                            <td><?= htmlspecialchars($emp['age']) ?></td>
+                            <td>
+                                <a href="?edit=<?= $emp['id'] ?>" class="btn btn-warning btn-sm">Modifier</a>
+                                <a href="?delete=<?= $emp['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Supprimer cet employé ?')">Supprimer</a>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
-                    <div class="bg-white rounded-lg shadow p-6 border-l-4 border-red-500">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <p class="text-sm text-gray-500">Produit Expirer</p>
-                                <h3 class="text-2xl font-bold text-red-800">23</h3>
-                            </div>
-                            <div class="p-3 rounded-full bg-red-100 text-red-600">
-                                <i data-feather="alert-circle"></i>
-                            </div>
-                        </div>
-                    </div>
+        <!-- Modal Ajout -->
+        <div class="modal fade" id="addModal" tabindex="-1">
+          <div class="modal-dialog">
+            <form method="post" class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Ajouter un Employé</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+              <div class="modal-body">
+                <input type="text" name="nom" class="form-control mb-2" placeholder="Nom" required>
+                <input type="text" name="prenom" class="form-control mb-2" placeholder="Prénom" required>
+                <input type="email" name="email" class="form-control mb-2" placeholder="Email" required>
+                <input type="number" name="age" class="form-control mb-2" placeholder="Âge" required>
+              </div>
+              <div class="modal-footer">
+                <button type="submit" name="add" class="btn btn-primary">Ajouter</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+              </div>
+            </form>
+          </div>
+        </div>
 
-                    <div class="bg-white rounded-lg shadow p-6 border-l-4 border-green-500">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <p class="text-sm text-gray-500">Total Ventes</p>
-                                <h3 class="text-2xl font-bold text-green-800">$42,567</h3>
-                            </div>
-                            <div class="p-3 rounded-full bg-green-100 text-green-600">
-                                <i data-feather="dollar-sign"></i>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-white rounded-lg shadow p-6 border-l-4 border-purple-500">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <p class="text-sm text-gray-500">Clients</p>
-                                <h3 class="text-2xl font-bold text-purple-800">89</h3>
-                            </div>
-                            <div class="p-3 rounded-full bg-purple-100 text-purple-600">
-                                <i data-feather="users"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Charts Section -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                    <div class="bg-white rounded-lg shadow p-6">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="font-semibold text-blue-800">Sales Overview</h3>
-                            <div class="flex space-x-2">
-                                <button class="px-3 py-1 text-xs bg-blue-100 text-blue-800 rounded">Week</button>
-                                <button class="px-3 py-1 text-xs bg-white text-gray-600 rounded">Month</button>
-                                <button class="px-3 py-1 text-xs bg-white text-gray-600 rounded">Year</button>
-                            </div>
-                        </div>
-                        <div class="h-64 bg-gray-50 rounded flex items-center justify-center">
-                            <p class="text-gray-400">Chart will be rendered here</p>
-                        </div>
-                    </div>
-
-                    <div class="bg-white rounded-lg shadow p-6">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="font-semibold text-blue-800">Product Categories</h3>
-                            <i data-feather="more-horizontal" class="text-gray-400"></i>
-                        </div>
-                        <div class="h-64 bg-gray-50 rounded flex items-center justify-center">
-                            <p class="text-gray-400">Pie chart will be rendered here</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Recent Alerts -->
-                <div class="bg-white rounded-lg shadow overflow-hidden">
-                    <div class="p-4 border-b border-gray-200">
-                        <h3 class="font-semibold text-blue-800 flex items-center">
-                            <i data-feather="bell" class="mr-2"></i> Recent Alerts
-                        </h3>
-                    </div>
-                    <div class="divide-y divide-gray-200">
-                        <div class="p-4 hover:bg-blue-50 flex items-start">
-                            <div class="p-2 rounded-full bg-red-100 text-red-600 mr-3">
-                                <i data-feather="alert-triangle" class="w-4 h-4"></i>
-                            </div>
-                            <div>
-                                <p class="font-medium">12 products will expire tomorrow!</p>
-                                <p class="text-sm text-gray-500">Meat category - Cold Room A</p>
-                            </div>
-                            <div class="ml-auto text-sm text-gray-500">2h ago</div>
-                        </div>
-                        <div class="p-4 hover:bg-blue-50 flex items-start">
-                            <div class="p-2 rounded-full bg-orange-100 text-orange-600 mr-3">
-                                <i data-feather="alert-circle" class="w-4 h-4"></i>
-                            </div>
-                            <div>
-                                <p class="font-medium">Low stock for dairy products</p>
-                                <p class="text-sm text-gray-500">Only 5 units remaining</p>
-                            </div>
-                            <div class="ml-auto text-sm text-gray-500">5h ago</div>
-                        </div>
-                        <div class="p-4 hover:bg-blue-50 flex items-start">
-                            <div class="p-2 rounded-full bg-yellow-100 text-yellow-600 mr-3">
-                                <i data-feather="clock" class="w-4 h-4"></i>
-                            </div>
-                            <div>
-                                <p class="font-medium">Temperature alert in Cold Room B</p>
-                                <p class="text-sm text-gray-500">Temperature rose to 5°C</p>
-                            </div>
-                            <div class="ml-auto text-sm text-gray-500">1d ago</div>
-                        </div>
-                    </div>
-                    <div class="p-3 bg-gray-50 text-center">
-                        <a href="#" class="text-sm text-blue-600 hover:underline">View all alerts</a>
-                    </div>
-                </div>
-            </main>
+        <!-- Modal Modification -->
+        <?php if ($editEmploye): ?>
+        <div class="modal fade show" style="display:block; background:rgba(0,0,0,0.5);" id="editModal" tabindex="-1">
+          <div class="modal-dialog">
+            <form method="post" class="modal-content">
+              <input type="hidden" name="id" value="<?= $editEmploye['id'] ?>">
+              <div class="modal-header">
+                <h5 class="modal-title">Modifier Employé</h5>
+                <a href="employes.php" class="btn-close"></a>
+              </div>
+              <div class="modal-body">
+                <input type="text" name="nom" class="form-control mb-2" value="<?= htmlspecialchars($editEmploye['nom']) ?>" required>
+                <input type="text" name="prenom" class="form-control mb-2" value="<?= htmlspecialchars($editEmploye['prenom']) ?>" required>
+                <input type="email" name="email" class="form-control mb-2" value="<?= htmlspecialchars($editEmploye['email']) ?>" required>
+                <input type="number" name="age" class="form-control mb-2" value="<?= htmlspecialchars($editEmploye['age']) ?>" required>
+              </div>
+              <div class="modal-footer">
+                <button type="submit" name="edit" class="btn btn-warning">Modifier</button>
+                <a href="employes.php" class="btn btn-secondary">Annuler</a>
+              </div>
+            </form>
+          </div>
+        </div>
+        <script>
+            document.body.classList.add('modal-open');
+        </script>
+        <?php endif; ?>
+    </main>
         </div>
     </div>
 
@@ -335,3 +336,5 @@ if (!isset($_SESSION['user_id']) ) {
     </script>
 </body>
 </html>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
