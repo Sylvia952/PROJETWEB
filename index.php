@@ -15,7 +15,7 @@ try {
         $default_email = "admin@coldmanager.com";
         $default_pass = password_hash("admin123", PASSWORD_DEFAULT);
         $pdo->prepare("INSERT INTO inscription (nom, prenom, email, mdp, role) VALUES (?, ?, ?, ?, ?)")
-            ->execute(["Admin", "Principal", $default_email, $default_pass, "admin"]);
+            ->execute(["HOUNDJO", "Sylvia", $default_email, $default_pass, "admin"]);
     }
 } catch (PDOException $e) {
     die("Erreur initiale : " . $e->getMessage());
