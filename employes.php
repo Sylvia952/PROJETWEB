@@ -102,7 +102,7 @@ if (isset($_GET['edit'])) {
 
                         <!-- Lien commun à tous -->
                         <li>
-                            <a href="index.php" class="flex items-center px-4 py-2 text-blue-900 bg-blue-100 rounded-lg">
+                            <a href="dashboard.php" class="flex items-center px-4 py-2 text-blue-900 bg-blue-100 rounded-lg">
                                 <i data-feather="home" class="mr-2"></i> Tableau de bord
                             </a>
                         </li>
