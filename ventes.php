@@ -64,39 +64,112 @@ $clients = $pdo->query("SELECT * FROM clients ORDER BY nom")->fetchAll(PDO::FETC
         </div>
         <div class="p-4 flex-1">
             <nav>
-                <ul class="space-y-1">
-                    <!-- Lien commun à tous -->
-                    <li>
-                        <a href="dashboard.php" class="flex items-center px-4 py-2 text-blue-900 bg-blue-100 rounded-lg">
-                            <i data-feather="home" class="mr-2"></i> Tableau de bord
-                        </a>
-                    </li>
+                    <ul class="space-y-1">
 
-                    <?php if ($_SESSION['role'] === 'admin'): ?>
-                        <!-- ADMIN -->
-                        <li><a href="employes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg"><i data-feather="users" class="mr-2"></i> Employés</a></li>
-                        <li><a href="clients.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg"><i data-feather="user-check" class="mr-2"></i> Clients</a></li>
-                        <li><a href="produits.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg"><i data-feather="package" class="mr-2"></i> Produits</a></li>
-                        <li><a href="categories.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg"><i data-feather="grid" class="mr-2"></i> Catégories</a></li>
-                        <li><a href="ventes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg"><i data-feather="shopping-cart" class="mr-2"></i> Ventes</a></li>
-                        <li><a href="factures.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg"><i data-feather="file-text" class="mr-2"></i> Factures</a></li>
-                        <li><a href="alertes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg"><i data-feather="bell" class="mr-2"></i> Alertes</a></li>
-                        <li><a href="paiements.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg"><i data-feather="credit-card" class="mr-2"></i> Paiements</a></li>
-                        <li><a href="statistiques.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg"><i data-feather="bar-chart-2" class="mr-2"></i> Statistiques</a></li>
-                    <?php else: ?>
-                        <!-- UTILISATEUR SIMPLE -->
-                        <li><a href="clients.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg"><i data-feather="users" class="mr-2"></i> Clients</a></li>
-                        <li><a href="ventes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg"><i data-feather="shopping-cart" class="mr-2"></i> Enregistrer une vente</a></li>
-                        <li><a href="produits.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg"><i data-feather="package" class="mr-2"></i> Produits disponibles</a></li>
-                        <li><a href="factures.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg"><i data-feather="file-text" class="mr-2"></i> Factures</a></li>
-                        <li><a href="alertes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg"><i data-feather="bell" class="mr-2"></i> Alertes</a></li>
-                        <li><a href="paiements.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg"><i data-feather="credit-card" class="mr-2"></i> Paiements</a></li>
-                    <?php endif; ?>
+                        <!-- Lien commun à tous -->
+                        <li>
+                            <a href="dashboard.php" class="flex items-center px-4 py-2 text-blue-900 bg-blue-100 rounded-lg">
+                                <i data-feather="home" class="mr-2"></i> Tableau de bord
+                            </a>
+                        </li>
 
-                    <!-- Lien commun -->
-                    <li><a href="../deconnexion.php" class="flex items-center px-4 py-2 text-red-700 hover:bg-red-50 rounded-lg"><i data-feather="log-out" class="mr-2"></i> Déconnexion</a></li>
-                </ul>
-            </nav>
+                        <?php if ($_SESSION['role'] === 'admin'): ?>
+                            <!-- 👑 MENU ADMINISTRATEUR -->
+                            <li>
+                                <a href="employes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                    <i data-feather="users" class="mr-2"></i> Employés
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="clients.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                    <i data-feather="user-check" class="mr-2"></i> Clients
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="produits.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                    <i data-feather="package" class="mr-2"></i> Produits
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="categories.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                    <i data-feather="grid" class="mr-2"></i> Catégories
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="ventes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                    <i data-feather="shopping-cart" class="mr-2"></i> Ventes
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="factures.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                    <i data-feather="file-text" class="mr-2"></i> Factures
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="alertes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                    <i data-feather="bell" class="mr-2"></i> Alertes
+                                </a>
+                            </li>
+
+
+                            <li>
+                                <a href="statistiques.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                    <i data-feather="bar-chart-2" class="mr-2"></i> Statistiques
+                                </a>
+                            </li>
+
+                        <?php elseif ($_SESSION['role'] === 'user'): ?>
+                            <!-- 👷 MENU EMPLOYÉ -->
+                            <li>
+                                <a href="clients.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                    <i data-feather="users" class="mr-2"></i> Clients
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="ventes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                    <i data-feather="shopping-cart" class="mr-2"></i> Enregistrer une vente
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="produits.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                    <i data-feather="package" class="mr-2"></i> Produits disponibles
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="factures.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                    <i data-feather="file-text" class="mr-2"></i> Factures
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="alertes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                    <i data-feather="bell" class="mr-2"></i> Alertes
+                                </a>
+                            </li>
+
+                            
+
+                        <?php endif; ?>
+
+                        <!-- Lien commun -->
+                        <li>
+                            <a href="../deconnexion.php" class="flex items-center px-4 py-2 text-red-700 hover:bg-red-50 rounded-lg">
+                                <i data-feather="log-out" class="mr-2"></i> Déconnexion
+                            </a>
+                        </li>
+
+                    </ul>
+
+                </nav>
         </div>
     </div>
 

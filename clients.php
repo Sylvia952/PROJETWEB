@@ -165,12 +165,7 @@ if (isset($_GET['edit'])) {
                                 </a>
                             </li>
 
-                            <li>
-                                <a href="paiements.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
-                                    <i data-feather="credit-card" class="mr-2"></i> Paiements
-                                </a>
-                            </li>
-
+                           
                             <li>
                                 <a href="statistiques.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
                                     <i data-feather="bar-chart-2" class="mr-2"></i> Statistiques
@@ -206,12 +201,6 @@ if (isset($_GET['edit'])) {
                             <li>
                                 <a href="alertes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
                                     <i data-feather="bell" class="mr-2"></i> Alertes
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="paiements.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
-                                    <i data-feather="credit-card" class="mr-2"></i> Paiements
                                 </a>
                             </li>
 
