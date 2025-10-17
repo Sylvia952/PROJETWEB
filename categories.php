@@ -122,12 +122,7 @@ if (isset($_GET['edit'])) {
                                 </a>
                             </li>
 
-                            <li>
-                                <a href="alertes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
-                                    <i data-feather="bell" class="mr-2"></i> Alertes
-                                </a>
-                            </li>
-
+                       
                            
 
                             <li>

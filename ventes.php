@@ -150,12 +150,7 @@ $clients = $pdo->query("SELECT * FROM clients ORDER BY nom")->fetchAll(PDO::FETC
                                 </a>
                             </li>
 
-                            <li>
-                                <a href="alertes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
-                                    <i data-feather="bell" class="mr-2"></i> Alertes
-                                </a>
-                            </li>
-
+                        
                             
 
                         <?php endif; ?>

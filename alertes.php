@@ -15,16 +15,34 @@ if (isset($_GET['read'])) {
     exit;
 }
 
-// Supprimer une alerte
+// Supprimer une alerte (ADMIN uniquement)
 if (isset($_GET['delete'])) {
+    if ($_SESSION['role'] !== 'admin') {
+        die("Accès refusé : vous n'êtes pas autorisé à supprimer cette alerte.");
+    }
     $stmt = $pdo->prepare("DELETE FROM alertes WHERE id = ?");
     $stmt->execute([$_GET['delete']]);
     header("Location: alertes.php");
     exit;
 }
 
+// Générer automatiquement les alertes pour produits en faible stock
+$seuil = 5;
+$produitsFaibleStock = $pdo->prepare("SELECT * FROM produits WHERE quantite <= ?");
+$produitsFaibleStock->execute([$seuil]);
+foreach ($produitsFaibleStock->fetchAll(PDO::FETCH_ASSOC) as $prod) {
+    // Vérifier si l'alerte existe déjà
+    $stmt = $pdo->prepare("SELECT id FROM alertes WHERE message = ?");
+    $msg = "Le produit '{$prod['nom']}' est en faible stock ({$prod['quantite']})";
+    $stmt->execute([$msg]);
+    if (!$stmt->fetch()) {
+        $stmt = $pdo->prepare("INSERT INTO alertes (message, date_alert) VALUES (?, NOW())");
+        $stmt->execute([$msg]);
+    }
+}
+
 // Récupérer toutes les alertes
-$alertes = $pdo->query("SELECT a.*, c.nom AS client_nom FROM alertes a LEFT JOIN clients c ON a.client_id = c.id ORDER BY a.date_alert DESC")->fetchAll(PDO::FETCH_ASSOC);
+$alertes = $pdo->query("SELECT * FROM alertes ORDER BY date_alert DESC")->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -37,9 +55,11 @@ $alertes = $pdo->query("SELECT a.*, c.nom AS client_nom FROM alertes a LEFT JOIN
 <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <style>
-.sidebar { background: linear-gradient(135deg, #e6f7ff 0%, #b3e0ff 100%); }
-.frosty-bg { background-color: #f0f9ff; }
-.alert-unread { font-weight: bold; background-color: #e6f7ff; }
+    .sidebar { background: linear-gradient(135deg, #e6f7ff 0%, #b3e0ff 100%); }
+    .frosty-bg { background-color: #f0f9ff; }
+    .alert-unread { font-weight: bold; background-color: #e6f7ff; }
+    .alert-bubble { animation: pulse 2s infinite; }
+    @keyframes pulse { 0%{transform:scale(1);}50%{transform:scale(1.05);}100%{transform:scale(1);} }
 </style>
 </head>
 <body class="frosty-bg">
@@ -52,7 +72,7 @@ $alertes = $pdo->query("SELECT a.*, c.nom AS client_nom FROM alertes a LEFT JOIN
             </h1>
         </div>
         <div class="p-4 flex-1">
-           <nav>
+          <nav>
                     <ul class="space-y-1">
 
                         <!-- Lien commun à tous -->
@@ -139,12 +159,6 @@ $alertes = $pdo->query("SELECT a.*, c.nom AS client_nom FROM alertes a LEFT JOIN
                                 </a>
                             </li>
 
-                            <li>
-                                <a href="alertes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
-                                    <i data-feather="bell" class="mr-2"></i> Alertes
-                                </a>
-                            </li>
-
                            
 
                         <?php endif; ?>
@@ -165,42 +179,46 @@ $alertes = $pdo->query("SELECT a.*, c.nom AS client_nom FROM alertes a LEFT JOIN
     <!-- Main content -->
     <div class="flex-1 overflow-auto">
         <header class="bg-white shadow-sm p-4 flex justify-between items-center">
-            <h2 class="text-xl font-semibold text-blue-800"><i data-feather="bell" class="inline mr-2"></i> Alertes</h2>
-            <b><?= htmlspecialchars($_SESSION['user_nom'] . ' ' . $_SESSION['user_prenom']) ?></b>
-        </header>
+                <h2 class="text-xl font-semibold text-blue-800">
+                    <i data-feather="bell" class="inline mr-2"></i> Alertes
+                </h2>
+                <div class="flex items-center space-x-4">
+                    <div class="relative">
+                        <i data-feather="bell" class="text-blue-600"></i>
+                        <span class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center alert-bubble">3</span>
+                    </div>
+                    <div class="w-8 h-8 rounded-full bg-blue-100 overflow-hidden">
+                        <img src="http://static.photos/blue/200x200/42" class="w-full h-full object-cover">
+                    </div>
+                    <b><?php echo $_SESSION['user_nom'] . ' ' . $_SESSION['user_prenom']; ?></b>
+                </div>
+            </header>
 
         <main class="p-6">
             <div class="bg-white rounded-lg shadow p-6 mb-8">
                 <h3 class="font-semibold text-blue-800 text-xl mb-4">Liste des alertes</h3>
-                <div class="overflow-x-auto">
-                    <table class="table table-bordered w-full">
-                        <thead class="bg-blue-50">
-                            <tr>
-                                <th>ID</th>
-                                <th>Client</th>
-                                <th>Message</th>
-                                <th>Date</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($alertes as $a): ?>
-                                <tr class="<?= $a['lue'] ? '' : 'alert-unread' ?>">
-                                    <td><?= $a['id'] ?></td>
-                                    <td><?= htmlspecialchars($a['client_nom'] ?? '-') ?></td>
-                                    <td><?= htmlspecialchars($a['message']) ?></td>
-                                    <td><?= date('d/m/Y H:i', strtotime($a['date_alert'])) ?></td>
-                                    <td>
-                                        <?php if (!$a['lue']): ?>
-                                            <a href="?read=<?= $a['id'] ?>" class="btn btn-success btn-sm">Marquer lu</a>
-                                        <?php endif; ?>
-                                        <a href="?delete=<?= $a['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Supprimer cette alerte ?')">Supprimer</a>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+         
+    <div class="row g-3">
+        <?php foreach ($alertes as $a): ?>
+        <div class="col-md-6">
+            <div class="card alert-card <?= $a['lue'] ? '' : 'alert-unread' ?>">
+                <div class="card-body">
+                    <h5 class="card-title">Alerte #<?= $a['id'] ?></h5>
+                    <p class="card-text"><?= htmlspecialchars($a['message']) ?></p>
+                    <p class="text-muted mb-2"><small><?= date('d/m/Y H:i', strtotime($a['date_alert'])) ?></small></p>
+                    <div class="d-flex gap-2">
+                        <?php if (!$a['lue']): ?>
+                            <a href="?read=<?= $a['id'] ?>" class="btn btn-sm btn-success">Marquer lu</a>
+                        <?php endif; ?>
+                        <?php if ($_SESSION['role'] === 'admin'): ?>
+                            <a href="?delete=<?= $a['id'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Supprimer cette alerte ?')">Supprimer</a>
+                        <?php endif; ?>
+                    </div>
                 </div>
+            </div>
+        </div>
+        <?php endforeach; ?>
+    </div>
             </div>
         </main>
     </div>
