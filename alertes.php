@@ -75,14 +75,15 @@ $alertes = $pdo->query("SELECT * FROM alertes ORDER BY date_alert DESC")->fetchA
           <nav>
                     <ul class="space-y-1">
 
-                        <!-- Lien commun à tous -->
+                      
+
+                        <?php if ($_SESSION['role'] === 'admin'): ?>
+                              <!-- Lien commun à tous -->
                         <li>
                             <a href="dashboard.php" class="flex items-center px-4 py-2 text-blue-900 bg-blue-100 rounded-lg">
                                 <i data-feather="home" class="mr-2"></i> Tableau de bord
                             </a>
                         </li>
-
-                        <?php if ($_SESSION['role'] === 'admin'): ?>
                             <!-- 👑 MENU ADMINISTRATEUR -->
                             <li>
                                 <a href="employes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">

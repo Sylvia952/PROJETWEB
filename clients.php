@@ -93,13 +93,14 @@ if (isset($_GET['edit'])) {
     <div class="p-4 flex-1">
         <nav>
             <ul class="space-y-1">
-                <li>
+               
+
+                <?php if ($_SESSION['role'] === 'admin'): ?>
+                     <li>
                     <a href="dashboard.php" class="flex items-center px-4 py-2 text-blue-900 bg-blue-100 rounded-lg">
                         <i data-feather="home" class="mr-2"></i> Tableau de bord
                     </a>
                 </li>
-
-                <?php if ($_SESSION['role'] === 'admin'): ?>
                     <li><a href="employes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg"><i data-feather="users" class="mr-2"></i> Employés</a></li>
                     <li><a href="clients.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg"><i data-feather="user-check" class="mr-2"></i> Clients</a></li>
                     <li><a href="produits.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg"><i data-feather="package" class="mr-2"></i> Produits</a></li>

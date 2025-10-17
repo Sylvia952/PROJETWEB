@@ -66,6 +66,7 @@ $clients = $pdo->query("SELECT * FROM clients ORDER BY nom")->fetchAll(PDO::FETC
             <nav>
                     <ul class="space-y-1">
 
+                        <?php if ($_SESSION['role'] === 'admin'): ?>
                         <!-- Lien commun à tous -->
                         <li>
                             <a href="dashboard.php" class="flex items-center px-4 py-2 text-blue-900 bg-blue-100 rounded-lg">
@@ -73,7 +74,6 @@ $clients = $pdo->query("SELECT * FROM clients ORDER BY nom")->fetchAll(PDO::FETC
                             </a>
                         </li>
 
-                        <?php if ($_SESSION['role'] === 'admin'): ?>
                             <!-- 👑 MENU ADMINISTRATEUR -->
                             <li>
                                 <a href="employes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
