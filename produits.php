@@ -195,7 +195,7 @@ $categories = $pdo->query("SELECT * FROM categories ORDER BY nom")->fetchAll(PDO
 
                         <!-- Lien commun -->
                         <li>
-                            <a href="../deconnexion.php" class="flex items-center px-4 py-2 text-red-700 hover:bg-red-50 rounded-lg">
+                            <a href="deconnexion.php" class="flex items-center px-4 py-2 text-red-700 hover:bg-red-50 rounded-lg">
                                 <i data-feather="log-out" class="mr-2"></i> Déconnexion
                             </a>
                         </li>

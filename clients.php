@@ -117,7 +117,7 @@ if (isset($_GET['edit'])) {
                     <li><a href="factures.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg"><i data-feather="file-text" class="mr-2"></i> Factures</a></li>
                 <?php endif; ?>
 
-                <li><a href="../deconnexion.php" class="flex items-center px-4 py-2 text-red-700 hover:bg-red-50 rounded-lg"><i data-feather="log-out" class="mr-2"></i> Déconnexion</a></li>
+                <li><a href="deconnexion.php" class="flex items-center px-4 py-2 text-red-700 hover:bg-red-50 rounded-lg"><i data-feather="log-out" class="mr-2"></i> Déconnexion</a></li>
             </ul>
         </nav>
     </div>
