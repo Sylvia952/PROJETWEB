@@ -153,6 +153,14 @@ CREATE TABLE IF NOT EXISTS factures (
     date_facture DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (vente_id) REFERENCES ventes(id) ON DELETE CASCADE
 );
+CREATE TABLE alertes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    client_id INT NULL,
+    message VARCHAR(255) NOT NULL,
+    date_alert DATETIME DEFAULT CURRENT_TIMESTAMP,
+    lue TINYINT(1) DEFAULT 0,
+    FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE SET NULL
+);
 
 --
 -- Index pour les tables déchargées
