@@ -258,7 +258,7 @@ $categories = $pdo->query("SELECT * FROM categories ORDER BY nom")->fetchAll(PDO
                                     <a href="?edit=<?= $p['id'] ?>" class="btn btn-warning btn-sm">Modifier</a>
                                     <a href="?delete=<?= $p['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Supprimer ce produit ?')">Supprimer</a>
                                 <?php else: ?>
-                                    <span class="text-muted">Aucune action</span>
+                                    <span class="text-muted">-----</span>
                                 <?php endif; ?>
                             </td>
                         </tr>
