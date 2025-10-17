@@ -86,7 +86,7 @@ if (!isset($_SESSION['user_id'])) {
 
                             <li>
                                 <a href="produits.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
-                                    <i data-feather="package" class="mr-2"></i> Produits & Stocks
+                                    <i data-feather="package" class="mr-2"></i> Produits 
                                 </a>
                             </li>
 
@@ -110,7 +110,7 @@ if (!isset($_SESSION['user_id'])) {
 
                             <li>
                                 <a href="alertes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
-                                    <i data-feather="bell" class="mr-2"></i> Alertes (stock / péremption)
+                                    <i data-feather="bell" class="mr-2"></i> Alertes 
                                 </a>
                             </li>
 
