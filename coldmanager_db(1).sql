@@ -114,6 +114,23 @@ CREATE TABLE clients (
     adresse TEXT
 );
 
+
+
+CREATE TABLE IF NOT EXISTS categories (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nom VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS produits (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nom VARCHAR(255) NOT NULL,
+    description TEXT,
+    prix DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    quantite INT NOT NULL DEFAULT 0,
+    categorie_id INT,
+    FOREIGN KEY (categorie_id) REFERENCES categories(id) ON DELETE SET NULL
+);
+
 --
 -- Index pour les tables déchargées
 --

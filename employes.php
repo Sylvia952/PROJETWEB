@@ -210,7 +210,7 @@ if (isset($_GET['edit'])) {
             <!-- Top Bar -->
             <header class="bg-white shadow-sm p-4 flex justify-between items-center">
                 <h2 class="text-xl font-semibold text-blue-800">
-                    <i data-feather="home" class="inline mr-2"></i> 
+                    <i data-feather="users" class="inline mr-2"></i> Gestion des employés
                 </h2>
                 
                 <div class="flex items-center space-x-4">
@@ -232,7 +232,7 @@ if (isset($_GET['edit'])) {
            <main class="p-6">
         <div class="bg-white rounded-lg shadow p-6 mb-8">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="font-semibold text-blue-800 text-xl">Gestion des Employés</h3>
+                <h3 class="font-semibold text-blue-800 text-xl">Listes des Employés</h3>
                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
                     <i class="mr-2"></i> Ajouter
                 </button>
