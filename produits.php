@@ -8,7 +8,10 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-// ✅ Ajouter un produit
+// ✅ Ajouter un produit (optionnel : restreindre aux admin si nécessaire)
+// if ($_SESSION['role'] !== 'admin') {
+//     die("Accès refusé : vous n'êtes pas autorisé à ajouter des produits.");
+// }
 if (isset($_POST['add'])) {
     $stmt = $pdo->prepare("INSERT INTO produits (nom, description, prix, quantite, categorie_id) VALUES (?, ?, ?, ?, ?)");
     $stmt->execute([
@@ -22,8 +25,11 @@ if (isset($_POST['add'])) {
     exit;
 }
 
-// ✅ Modifier un produit
+// ✅ Modifier un produit (ADMIN uniquement)
 if (isset($_POST['edit'])) {
+    if ($_SESSION['role'] !== 'admin') {
+        die("Accès refusé : vous n'êtes pas autorisé à modifier des produits.");
+    }
     $stmt = $pdo->prepare("UPDATE produits SET nom=?, description=?, prix=?, quantite=?, categorie_id=? WHERE id=?");
     $stmt->execute([
         $_POST['nom'],
@@ -37,8 +43,11 @@ if (isset($_POST['edit'])) {
     exit;
 }
 
-// ✅ Supprimer un produit
+// ✅ Supprimer un produit (ADMIN uniquement)
 if (isset($_GET['delete'])) {
+    if ($_SESSION['role'] !== 'admin') {
+        die("Accès refusé : vous n'êtes pas autorisé à supprimer des produits.");
+    }
     $stmt = $pdo->prepare("DELETE FROM produits WHERE id=?");
     $stmt->execute([$_GET['delete']]);
     header("Location: produits.php");
@@ -67,57 +76,32 @@ $categories = $pdo->query("SELECT * FROM categories ORDER BY nom")->fetchAll(PDO
 
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cold Manager - Produits</title>
-    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .sidebar {
-            background: linear-gradient(135deg, #e6f7ff 0%, #b3e0ff 100%);
-        }
-
-        .frosty-bg {
-            background-color: #f0f9ff;
-        }
-
-        .alert-bubble {
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% {
-                transform: scale(1);
-            }
-
-            50% {
-                transform: scale(1.05);
-            }
-
-            100% {
-                transform: scale(1);
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cold Manager - Produits</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+.sidebar { background: linear-gradient(135deg, #e6f7ff 0%, #b3e0ff 100%); }
+.frosty-bg { background-color: #f0f9ff; }
+.alert-bubble { animation: pulse 2s infinite; }
+@keyframes pulse { 0%{transform:scale(1);}50%{transform:scale(1.05);}100%{transform:scale(1);} }
+</style>
 </head>
-
 <body class="frosty-bg">
-    <div class="flex h-screen">
+<div class="flex h-screen">
 
-        <!-- ✅ Sidebar -->
-        <div class="sidebar w-64 shadow-lg flex flex-col">
-            <div class="p-4 text-center border-b border-blue-200">
-                <h1 class="text-2xl font-bold text-blue-800 flex items-center justify-center">
-                    <i data-feather="wind" class="mr-2"></i> Cold Manager
-                </h1>
-            </div>
-            <div class="p-4 flex-1">
-                <nav>
+    <!-- Sidebar -->
+    <div class="sidebar w-64 shadow-lg flex flex-col">
+        <div class="p-4 text-center border-b border-blue-200">
+            <h1 class="text-2xl font-bold text-blue-800 flex items-center justify-center">
+                <i data-feather="wind" class="mr-2"></i> Cold Manager
+            </h1>
+        </div>
+        <div class="p-4 flex-1">
+              <nav>
 
                     <ul class="space-y-1">
 
@@ -233,12 +217,12 @@ $categories = $pdo->query("SELECT * FROM categories ORDER BY nom")->fetchAll(PDO
 
                     </ul>
                 </nav>
-            </div>
         </div>
+    </div>
 
-        <!-- ✅ Contenu principal -->
-        <div class="flex-1 overflow-auto">
-            <header class="bg-white shadow-sm p-4 flex justify-between items-center">
+    <!-- Main content -->
+    <div class="flex-1 overflow-auto">
+      <header class="bg-white shadow-sm p-4 flex justify-between items-center">
                 <h2 class="text-xl font-semibold text-blue-800">
                     <i data-feather="package" class="inline mr-2"></i> Gestion des produits
                 </h2>
@@ -251,111 +235,114 @@ $categories = $pdo->query("SELECT * FROM categories ORDER BY nom")->fetchAll(PDO
                 </div>
             </header>
 
-            <main class="p-6">
-                <!-- ✅ Liste des produits -->
-                <div class="bg-white rounded-lg shadow p-6 mb-8">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-semibold text-blue-800 text-xl">Liste des produits</h3>
+        <main class="p-6">
+            <div class="bg-white rounded-lg shadow p-6 mb-8">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-semibold text-blue-800 text-xl">Liste des produits</h3>
+                    <?php if ($_SESSION['role'] === 'admin'): ?>
                         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">Ajouter</button>
-                    </div>
-
-                    <table class="table table-bordered">
-                        <thead class="bg-blue-50">
-                            <tr>
-                                <th>Nom</th>
-                                <th>Description</th>
-                                <th>Prix</th>
-                                <th>Quantité</th>
-                                <th>Catégorie</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($produits as $p): ?>
-                                <tr>
-                                    <td><?= htmlspecialchars($p['nom']) ?></td>
-                                    <td><?= htmlspecialchars($p['description']) ?></td>
-                                    <td><?= htmlspecialchars($p['prix']) ?> €</td>
-                                    <td><?= htmlspecialchars($p['quantite']) ?></td>
-                                    <td><?= htmlspecialchars($p['categorie_nom']) ?></td>
-                                    <td>
-                                        <a href="?edit=<?= $p['id'] ?>" class="btn btn-warning btn-sm">Modifier</a>
-                                        <a href="?delete=<?= $p['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Supprimer ce produit ?')">Supprimer</a>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+                    <?php endif; ?>
                 </div>
 
-                <!-- ✅ Modal Ajout -->
-                <div class="modal fade" id="addModal" tabindex="-1">
-                    <div class="modal-dialog">
-                        <form method="post" class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Ajouter un produit</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                            </div>
-                            <div class="modal-body">
-                                <input type="text" name="nom" class="form-control mb-2" placeholder="Nom" required>
-                                <textarea name="description" class="form-control mb-2" placeholder="Description"></textarea>
-                                <input type="number" step="0.01" name="prix" class="form-control mb-2" placeholder="Prix" required>
-                                <input type="number" name="quantite" class="form-control mb-2" placeholder="Quantité" required>
-                                <select name="categorie_id" class="form-control mb-2" required>
-                                    <option value="">-- Sélectionner une catégorie --</option>
-                                    <?php foreach ($categories as $c): ?>
-                                        <option value="<?= $c['id'] ?>"><?= htmlspecialchars($c['nom']) ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="submit" name="add" class="btn btn-primary">Ajouter</button>
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+                <table class="table table-bordered">
+                    <thead class="bg-blue-50">
+                        <tr>
+                            <th>Nom</th>
+                            <th>Description</th>
+                            <th>Prix</th>
+                            <th>Quantité</th>
+                            <th>Catégorie</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($produits as $p): ?>
+                        <tr>
+                            <td><?= htmlspecialchars($p['nom']) ?></td>
+                            <td><?= htmlspecialchars($p['description']) ?></td>
+                            <td><?= htmlspecialchars($p['prix']) ?> €</td>
+                            <td><?= htmlspecialchars($p['quantite']) ?></td>
+                            <td><?= htmlspecialchars($p['categorie_nom']) ?></td>
+                            <td>
+                                <?php if ($_SESSION['role'] === 'admin'): ?>
+                                    <a href="?edit=<?= $p['id'] ?>" class="btn btn-warning btn-sm">Modifier</a>
+                                    <a href="?delete=<?= $p['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Supprimer ce produit ?')">Supprimer</a>
+                                <?php else: ?>
+                                    <span class="text-muted">Aucune action</span>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
 
-                <!-- ✅ Modal Édition -->
-                <?php if ($editProduit): ?>
-                    <div class="modal fade show" style="display:block; background:rgba(0,0,0,0.5);" id="editModal">
-                        <div class="modal-dialog">
-                            <form method="post" class="modal-content">
-                                <input type="hidden" name="id" value="<?= $editProduit['id'] ?>">
-                                <div class="modal-header">
-                                    <h5 class="modal-title">Modifier le produit</h5>
-                                    <a href="produits.php" class="btn-close"></a>
-                                </div>
-                                <div class="modal-body">
-                                    <input type="text" name="nom" class="form-control mb-2" value="<?= htmlspecialchars($editProduit['nom']) ?>" required>
-                                    <textarea name="description" class="form-control mb-2"><?= htmlspecialchars($editProduit['description']) ?></textarea>
-                                    <input type="number" step="0.01" name="prix" class="form-control mb-2" value="<?= htmlspecialchars($editProduit['prix']) ?>" required>
-                                    <input type="number" name="quantite" class="form-control mb-2" value="<?= htmlspecialchars($editProduit['quantite']) ?>" required>
-                                    <select name="categorie_id" class="form-control mb-2" required>
-                                        <?php foreach ($categories as $c): ?>
-                                            <option value="<?= $c['id'] ?>" <?= $c['id'] == $editProduit['categorie_id'] ? 'selected' : '' ?>><?= htmlspecialchars($c['nom']) ?></option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="submit" name="edit" class="btn btn-warning">Modifier</button>
-                                    <a href="produits.php" class="btn btn-secondary">Annuler</a>
-                                </div>
-                            </form>
+            <!-- Modal Ajout (ADMIN uniquement) -->
+            <?php if ($_SESSION['role'] === 'admin'): ?>
+            <div class="modal fade" id="addModal" tabindex="-1">
+                <div class="modal-dialog">
+                    <form method="post" class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Ajouter un produit</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
-                    </div>
-                    <script>
-                        document.body.classList.add('modal-open');
-                    </script>
-                <?php endif; ?>
-            </main>
-        </div>
+                        <div class="modal-body">
+                            <input type="text" name="nom" class="form-control mb-2" placeholder="Nom" required>
+                            <textarea name="description" class="form-control mb-2" placeholder="Description"></textarea>
+                            <input type="number" step="0.01" name="prix" class="form-control mb-2" placeholder="Prix" required>
+                            <input type="number" name="quantite" class="form-control mb-2" placeholder="Quantité" required>
+                            <select name="categorie_id" class="form-control mb-2" required>
+                                <option value="">-- Sélectionner une catégorie --</option>
+                                <?php foreach ($categories as $c): ?>
+                                    <option value="<?= $c['id'] ?>"><?= htmlspecialchars($c['nom']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" name="add" class="btn btn-primary">Ajouter</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <?php endif; ?>
+
+            <!-- Modal Édition (ADMIN uniquement) -->
+            <?php if ($editProduit && $_SESSION['role'] === 'admin'): ?>
+            <div class="modal fade show" style="display:block; background:rgba(0,0,0,0.5);" id="editModal">
+                <div class="modal-dialog">
+                    <form method="post" class="modal-content">
+                        <input type="hidden" name="id" value="<?= $editProduit['id'] ?>">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Modifier le produit</h5>
+                            <a href="produits.php" class="btn-close"></a>
+                        </div>
+                        <div class="modal-body">
+                            <input type="text" name="nom" class="form-control mb-2" value="<?= htmlspecialchars($editProduit['nom']) ?>" required>
+                            <textarea name="description" class="form-control mb-2"><?= htmlspecialchars($editProduit['description']) ?></textarea>
+                            <input type="number" step="0.01" name="prix" class="form-control mb-2" value="<?= htmlspecialchars($editProduit['prix']) ?>" required>
+                            <input type="number" name="quantite" class="form-control mb-2" value="<?= htmlspecialchars($editProduit['quantite']) ?>" required>
+                            <select name="categorie_id" class="form-control mb-2" required>
+                                <?php foreach ($categories as $c): ?>
+                                    <option value="<?= $c['id'] ?>" <?= $c['id'] == $editProduit['categorie_id'] ? 'selected' : '' ?>><?= htmlspecialchars($c['nom']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" name="edit" class="btn btn-warning">Modifier</button>
+                            <a href="produits.php" class="btn btn-secondary">Annuler</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <script>document.body.classList.add('modal-open');</script>
+            <?php endif; ?>
+
+        </main>
     </div>
+</div>
 
-    <script>
-        feather.replace();
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>feather.replace();</script>
 </body>
-
 </html>

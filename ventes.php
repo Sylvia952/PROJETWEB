@@ -7,7 +7,7 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-// Ajouter une vente
+// ✅ Ajouter une vente (tous les utilisateurs)
 if (isset($_POST['add'])) {
     $stmt = $pdo->prepare("INSERT INTO ventes (produit_id, client_id, quantite, prix_total, date_vente) VALUES (?, ?, ?, ?, NOW())");
     $stmt->execute([$_POST['produit_id'], $_POST['client_id'], $_POST['quantite'], $_POST['prix_total']]);
@@ -15,22 +15,25 @@ if (isset($_POST['add'])) {
     exit;
 }
 
-// Supprimer une vente
+// ✅ Supprimer une vente (ADMIN uniquement)
 if (isset($_GET['delete'])) {
+    if ($_SESSION['role'] !== 'admin') {
+        die("Accès refusé : vous n'êtes pas autorisé à supprimer une vente.");
+    }
     $stmt = $pdo->prepare("DELETE FROM ventes WHERE id=?");
     $stmt->execute([$_GET['delete']]);
     header("Location: ventes.php");
     exit;
 }
 
-// Récupérer toutes les ventes
+// ✅ Récupérer toutes les ventes
 $ventes = $pdo->query("SELECT v.*, p.nom AS produit_nom, p.prix AS produit_prix, c.nom AS client_nom 
     FROM ventes v
     JOIN produits p ON v.produit_id = p.id
     JOIN clients c ON v.client_id = c.id
     ORDER BY v.date_vente DESC")->fetchAll(PDO::FETCH_ASSOC);
 
-// Récupérer les produits et clients pour le formulaire
+// ✅ Récupérer les produits et clients pour le formulaire
 $produits = $pdo->query("SELECT * FROM produits ORDER BY nom")->fetchAll(PDO::FETCH_ASSOC);
 $clients = $pdo->query("SELECT * FROM clients ORDER BY nom")->fetchAll(PDO::FETCH_ASSOC);
 ?>
@@ -46,12 +49,8 @@ $clients = $pdo->query("SELECT * FROM clients ORDER BY nom")->fetchAll(PDO::FETC
     <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        .sidebar {
-            background: linear-gradient(135deg, #e6f7ff 0%, #b3e0ff 100%);
-        }
-        .frosty-bg {
-            background-color: #f0f9ff;
-        }
+        .sidebar { background: linear-gradient(135deg, #e6f7ff 0%, #b3e0ff 100%); }
+        .frosty-bg { background-color: #f0f9ff; }
     </style>
 </head>
 <body class="frosty-bg">
@@ -63,156 +62,66 @@ $clients = $pdo->query("SELECT * FROM clients ORDER BY nom")->fetchAll(PDO::FETC
                 <i data-feather="wind" class="mr-2"></i> Cold Manager
             </h1>
         </div>
-
         <div class="p-4 flex-1">
-         <nav>
-                    <ul class="space-y-1">
+            <nav>
+                <ul class="space-y-1">
+                    <!-- Lien commun à tous -->
+                    <li>
+                        <a href="dashboard.php" class="flex items-center px-4 py-2 text-blue-900 bg-blue-100 rounded-lg">
+                            <i data-feather="home" class="mr-2"></i> Tableau de bord
+                        </a>
+                    </li>
 
-                        <!-- Lien commun à tous -->
-                        <li>
-                            <a href="dashboard.php" class="flex items-center px-4 py-2 text-blue-900 bg-blue-100 rounded-lg">
-                                <i data-feather="home" class="mr-2"></i> Tableau de bord
-                            </a>
-                        </li>
+                    <?php if ($_SESSION['role'] === 'admin'): ?>
+                        <!-- ADMIN -->
+                        <li><a href="employes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg"><i data-feather="users" class="mr-2"></i> Employés</a></li>
+                        <li><a href="clients.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg"><i data-feather="user-check" class="mr-2"></i> Clients</a></li>
+                        <li><a href="produits.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg"><i data-feather="package" class="mr-2"></i> Produits</a></li>
+                        <li><a href="categories.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg"><i data-feather="grid" class="mr-2"></i> Catégories</a></li>
+                        <li><a href="ventes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg"><i data-feather="shopping-cart" class="mr-2"></i> Ventes</a></li>
+                        <li><a href="factures.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg"><i data-feather="file-text" class="mr-2"></i> Factures</a></li>
+                        <li><a href="alertes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg"><i data-feather="bell" class="mr-2"></i> Alertes</a></li>
+                        <li><a href="paiements.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg"><i data-feather="credit-card" class="mr-2"></i> Paiements</a></li>
+                        <li><a href="statistiques.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg"><i data-feather="bar-chart-2" class="mr-2"></i> Statistiques</a></li>
+                    <?php else: ?>
+                        <!-- UTILISATEUR SIMPLE -->
+                        <li><a href="clients.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg"><i data-feather="users" class="mr-2"></i> Clients</a></li>
+                        <li><a href="ventes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg"><i data-feather="shopping-cart" class="mr-2"></i> Enregistrer une vente</a></li>
+                        <li><a href="produits.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg"><i data-feather="package" class="mr-2"></i> Produits disponibles</a></li>
+                        <li><a href="factures.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg"><i data-feather="file-text" class="mr-2"></i> Factures</a></li>
+                        <li><a href="alertes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg"><i data-feather="bell" class="mr-2"></i> Alertes</a></li>
+                        <li><a href="paiements.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg"><i data-feather="credit-card" class="mr-2"></i> Paiements</a></li>
+                    <?php endif; ?>
 
-                        <?php if ($_SESSION['role'] === 'admin'): ?>
-                            <!-- 👑 MENU ADMINISTRATEUR -->
-                            <li>
-                                <a href="employes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
-                                    <i data-feather="users" class="mr-2"></i> Employés
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="clients.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
-                                    <i data-feather="user-check" class="mr-2"></i> Clients
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="produits.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
-                                    <i data-feather="package" class="mr-2"></i> Produits
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="categories.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
-                                    <i data-feather="grid" class="mr-2"></i> Catégories
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="ventes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
-                                    <i data-feather="shopping-cart" class="mr-2"></i> Ventes
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="factures.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
-                                    <i data-feather="file-text" class="mr-2"></i> Factures
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="alertes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
-                                    <i data-feather="bell" class="mr-2"></i> Alertes
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="paiements.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
-                                    <i data-feather="credit-card" class="mr-2"></i> Paiements
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="statistiques.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
-                                    <i data-feather="bar-chart-2" class="mr-2"></i> Statistiques
-                                </a>
-                            </li>
-
-                        <?php elseif ($_SESSION['role'] === 'user'): ?>
-                            <!-- 👷 MENU EMPLOYÉ -->
-                            <li>
-                                <a href="clients.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
-                                    <i data-feather="users" class="mr-2"></i> Clients
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="ventes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
-                                    <i data-feather="shopping-cart" class="mr-2"></i> Enregistrer une vente
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="produits.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
-                                    <i data-feather="package" class="mr-2"></i> Produits disponibles
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="factures.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
-                                    <i data-feather="file-text" class="mr-2"></i> Factures
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="alertes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
-                                    <i data-feather="bell" class="mr-2"></i> Alertes
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="paiements.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
-                                    <i data-feather="credit-card" class="mr-2"></i> Paiements
-                                </a>
-                            </li>
-
-                        <?php endif; ?>
-
-                        <!-- Lien commun -->
-                        <li>
-                            <a href="../deconnexion.php" class="flex items-center px-4 py-2 text-red-700 hover:bg-red-50 rounded-lg">
-                                <i data-feather="log-out" class="mr-2"></i> Déconnexion
-                            </a>
-                        </li>
-
-                    </ul>
-
-                </nav>
+                    <!-- Lien commun -->
+                    <li><a href="../deconnexion.php" class="flex items-center px-4 py-2 text-red-700 hover:bg-red-50 rounded-lg"><i data-feather="log-out" class="mr-2"></i> Déconnexion</a></li>
+                </ul>
+            </nav>
         </div>
     </div>
 
     <!-- Main content -->
     <div class="flex-1 overflow-auto">
-      <header class="bg-white shadow-sm p-4 flex justify-between items-center">
-                <h2 class="text-xl font-semibold text-blue-800">
-                    <i data-feather="shopping-cart" class="inline mr-2"></i> Gestion des ventes
-                </h2>
-
-                <div class="flex items-center space-x-4">
-                    <div class="relative">
-                        <i data-feather="bell" class="text-blue-600"></i>
-                        <span class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center alert-bubble">3</span>
-                    </div>
-                    <div class="w-8 h-8 rounded-full bg-blue-100 overflow-hidden">
-                        <img src="http://static.photos/blue/200x200/42" class="w-full h-full object-cover">
-                    </div>
-                    <b>
-                        <?php echo $_SESSION['user_nom'] . ' ' . $_SESSION['user_prenom']; ?>
-
-                    </b>
+        <header class="bg-white shadow-sm p-4 flex justify-between items-center">
+            <h2 class="text-xl font-semibold text-blue-800">
+                <i data-feather="shopping-cart" class="inline mr-2"></i> Gestion des ventes
+            </h2>
+            <div class="flex items-center space-x-4">
+                <div class="relative">
+                    <i data-feather="bell" class="text-blue-600"></i>
                 </div>
-            </header>
+                <div class="w-8 h-8 rounded-full bg-blue-100 overflow-hidden">
+                    <img src="http://static.photos/blue/200x200/42" class="w-full h-full object-cover">
+                </div>
+                <b><?= $_SESSION['user_nom'] . ' ' . $_SESSION['user_prenom'] ?></b>
+            </div>
+        </header>
 
         <main class="p-6">
             <div class="bg-white rounded-lg shadow p-6 mb-8">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="font-semibold text-blue-800 text-xl">Liste des ventes</h3>
-                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
-                        Nouvelle vente
-                    </button>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">Nouvelle vente</button>
                 </div>
                 <table class="table table-bordered w-full">
                     <thead class="bg-blue-50">
@@ -231,14 +140,15 @@ $clients = $pdo->query("SELECT * FROM clients ORDER BY nom")->fetchAll(PDO::FETC
                                 <td><?= htmlspecialchars($v['produit_nom']) ?></td>
                                 <td><?= htmlspecialchars($v['client_nom']) ?></td>
                                 <td><?= htmlspecialchars($v['quantite']) ?></td>
-                                <td><?= htmlspecialchars(number_format($v['prix_total'], 0, ',', ' ')) ?> FCFA</td>
+                                <td><?= number_format($v['prix_total'], 0, ',', ' ') ?> FCFA</td>
                                 <td><?= htmlspecialchars($v['date_vente']) ?></td>
                                 <td>
-                                    <a href="?delete=<?= $v['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Supprimer cette vente ?')">
-                                        Supprimer
-                                    </a>
+                                    <?php if ($_SESSION['role'] === 'admin'): ?>
+                                        <a href="?delete=<?= $v['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Supprimer cette vente ?')">Supprimer</a>
+                                    <?php else: ?>
+                                        <span class="text-muted">—</span>
+                                    <?php endif; ?>
                                 </td>
-                                
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -261,9 +171,7 @@ $clients = $pdo->query("SELECT * FROM clients ORDER BY nom")->fetchAll(PDO::FETC
         <select name="produit_id" id="produit_id" class="form-control mb-3" required>
             <option value="">-- Sélectionner un produit --</option>
             <?php foreach ($produits as $p): ?>
-                <option value="<?= $p['id'] ?>" data-prix="<?= $p['prix'] ?>">
-                    <?= htmlspecialchars($p['nom']) ?>
-                </option>
+                <option value="<?= $p['id'] ?>" data-prix="<?= $p['prix'] ?>"><?= htmlspecialchars($p['nom']) ?></option>
             <?php endforeach; ?>
         </select>
 
@@ -303,7 +211,7 @@ $clients = $pdo->query("SELECT * FROM clients ORDER BY nom")->fetchAll(PDO::FETC
 <script>
 feather.replace();
 
-// 💰 Calcul automatique du prix total en FCFA
+// Calcul automatique du prix total
 document.addEventListener("DOMContentLoaded", function () {
     const produitSelect = document.getElementById("produit_id");
     const prixUnitaireInput = document.getElementById("prix_unitaire");
@@ -314,7 +222,6 @@ document.addEventListener("DOMContentLoaded", function () {
         const selectedOption = produitSelect.options[produitSelect.selectedIndex];
         const prixUnitaire = parseFloat(selectedOption.getAttribute("data-prix")) || 0;
         const quantite = parseInt(quantiteInput.value) || 0;
-
         prixUnitaireInput.value = prixUnitaire.toFixed(0);
         prixTotalInput.value = (prixUnitaire * quantite).toFixed(0);
     }
