@@ -1,6 +1,6 @@
 <?php
 session_start();
-if (!isset($_SESSION['user_id']) ) {
+if (!isset($_SESSION['user_id'])) {
     header('Location: ../index.php');
     exit();
 }
@@ -8,6 +8,7 @@ if (!isset($_SESSION['user_id']) ) {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,19 +22,31 @@ if (!isset($_SESSION['user_id']) ) {
         .sidebar {
             background: linear-gradient(135deg, #e6f7ff 0%, #b3e0ff 100%);
         }
+
         .frosty-bg {
             background-color: #f0f9ff;
         }
+
         .alert-bubble {
             animation: pulse 2s infinite;
         }
+
         @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
         }
     </style>
 </head>
+
 <body class="frosty-bg">
     <div class="flex h-screen">
         <!-- Sidebar -->
@@ -43,129 +56,129 @@ if (!isset($_SESSION['user_id']) ) {
                     <i data-feather="wind" class="mr-2"></i> Cold Manager
                 </h1>
             </div>
-            
+
             <div class="p-4 flex-1">
-             
+
 
                 <nav>
-                  <ul class="space-y-1">
+                    <ul class="space-y-1">
 
-    <!-- Lien commun à tous -->
-    <li>
-        <a href="index.php" class="flex items-center px-4 py-2 text-blue-900 bg-blue-100 rounded-lg">
-            <i data-feather="home" class="mr-2"></i> Tableau de bord
-        </a>
-    </li>
+                        <!-- Lien commun à tous -->
+                        <li>
+                            <a href="index.php" class="flex items-center px-4 py-2 text-blue-900 bg-blue-100 rounded-lg">
+                                <i data-feather="home" class="mr-2"></i> Tableau de bord
+                            </a>
+                        </li>
 
-    <?php if ($_SESSION['role'] === 'admin'): ?>
-        <!-- 👑 MENU ADMINISTRATEUR -->
-        <li>
-            <a href="employes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
-                <i data-feather="users" class="mr-2"></i> Employés
-            </a>
-        </li>
+                        <?php if ($_SESSION['role'] === 'admin'): ?>
+                            <!-- 👑 MENU ADMINISTRATEUR -->
+                            <li>
+                                <a href="employes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                    <i data-feather="users" class="mr-2"></i> Employés
+                                </a>
+                            </li>
 
-        <li>
-            <a href="clients.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
-                <i data-feather="user-check" class="mr-2"></i> Clients
-            </a>
-        </li>
+                            <li>
+                                <a href="clients.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                    <i data-feather="user-check" class="mr-2"></i> Clients
+                                </a>
+                            </li>
 
-        <li>
-            <a href="produits.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
-                <i data-feather="package" class="mr-2"></i> Produits & Stocks
-            </a>
-        </li>
+                            <li>
+                                <a href="produits.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                    <i data-feather="package" class="mr-2"></i> Produits & Stocks
+                                </a>
+                            </li>
 
-        <li>
-            <a href="categories.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
-                <i data-feather="grid" class="mr-2"></i> Catégories
-            </a>
-        </li>
+                            <li>
+                                <a href="categories.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                    <i data-feather="grid" class="mr-2"></i> Catégories
+                                </a>
+                            </li>
 
-        <li>
-            <a href="ventes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
-                <i data-feather="shopping-cart" class="mr-2"></i> Ventes
-            </a>
-        </li>
+                            <li>
+                                <a href="ventes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                    <i data-feather="shopping-cart" class="mr-2"></i> Ventes
+                                </a>
+                            </li>
 
-        <li>
-            <a href="factures.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
-                <i data-feather="file-text" class="mr-2"></i> Factures
-            </a>
-        </li>
+                            <li>
+                                <a href="factures.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                    <i data-feather="file-text" class="mr-2"></i> Factures
+                                </a>
+                            </li>
 
-        <li>
-            <a href="alertes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
-                <i data-feather="bell" class="mr-2"></i> Alertes (stock / péremption)
-            </a>
-        </li>
+                            <li>
+                                <a href="alertes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                    <i data-feather="bell" class="mr-2"></i> Alertes (stock / péremption)
+                                </a>
+                            </li>
 
-        <li>
-            <a href="paiements.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
-                <i data-feather="credit-card" class="mr-2"></i> Paiements
-            </a>
-        </li>
+                            <li>
+                                <a href="paiements.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                    <i data-feather="credit-card" class="mr-2"></i> Paiements
+                                </a>
+                            </li>
 
-        <li>
-            <a href="statistiques.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
-                <i data-feather="bar-chart-2" class="mr-2"></i> Statistiques
-            </a>
-        </li>
+                            <li>
+                                <a href="statistiques.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                    <i data-feather="bar-chart-2" class="mr-2"></i> Statistiques
+                                </a>
+                            </li>
 
-    <?php elseif ($_SESSION['role'] === 'user'): ?>
-        <!-- 👷 MENU EMPLOYÉ -->
-        <li>
-            <a href="clients.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
-                <i data-feather="users" class="mr-2"></i> Clients
-            </a>
-        </li>
+                        <?php elseif ($_SESSION['role'] === 'user'): ?>
+                            <!-- 👷 MENU EMPLOYÉ -->
+                            <li>
+                                <a href="clients.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                    <i data-feather="users" class="mr-2"></i> Clients
+                                </a>
+                            </li>
 
-        <li>
-            <a href="ventes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
-                <i data-feather="shopping-cart" class="mr-2"></i> Enregistrer une vente
-            </a>
-        </li>
+                            <li>
+                                <a href="ventes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                    <i data-feather="shopping-cart" class="mr-2"></i> Enregistrer une vente
+                                </a>
+                            </li>
 
-        <li>
-            <a href="produits.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
-                <i data-feather="package" class="mr-2"></i> Produits disponibles
-            </a>
-        </li>
+                            <li>
+                                <a href="produits.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                    <i data-feather="package" class="mr-2"></i> Produits disponibles
+                                </a>
+                            </li>
 
-        <li>
-            <a href="factures.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
-                <i data-feather="file-text" class="mr-2"></i> Factures
-            </a>
-        </li>
+                            <li>
+                                <a href="factures.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                    <i data-feather="file-text" class="mr-2"></i> Factures
+                                </a>
+                            </li>
 
-        <li>
-            <a href="alertes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
-                <i data-feather="bell" class="mr-2"></i> Alertes
-            </a>
-        </li>
+                            <li>
+                                <a href="alertes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                    <i data-feather="bell" class="mr-2"></i> Alertes
+                                </a>
+                            </li>
 
-        <li>
-            <a href="paiements.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
-                <i data-feather="credit-card" class="mr-2"></i> Paiements
-            </a>
-        </li>
+                            <li>
+                                <a href="paiements.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                    <i data-feather="credit-card" class="mr-2"></i> Paiements
+                                </a>
+                            </li>
 
-    <?php endif; ?>
+                        <?php endif; ?>
 
-    <!-- Lien commun -->
-    <li>
-        <a href="../deconnexion.php" class="flex items-center px-4 py-2 text-red-700 hover:bg-red-50 rounded-lg">
-            <i data-feather="log-out" class="mr-2"></i> Déconnexion
-        </a>
-    </li>
+                        <!-- Lien commun -->
+                        <li>
+                            <a href="../deconnexion.php" class="flex items-center px-4 py-2 text-red-700 hover:bg-red-50 rounded-lg">
+                                <i data-feather="log-out" class="mr-2"></i> Déconnexion
+                            </a>
+                        </li>
 
-</ul>
+                    </ul>
 
                 </nav>
             </div>
 
-          
+
         </div>
 
         <!-- Main Content -->
@@ -173,9 +186,9 @@ if (!isset($_SESSION['user_id']) ) {
             <!-- Top Bar -->
             <header class="bg-white shadow-sm p-4 flex justify-between items-center">
                 <h2 class="text-xl font-semibold text-blue-800">
-                    <i data-feather="home" class="inline mr-2"></i> 
+                    <i data-feather="home" class="inline mr-2"></i>
                 </h2>
-                
+
                 <div class="flex items-center space-x-4">
                     <div class="relative">
                         <i data-feather="bell" class="text-blue-600"></i>
@@ -185,9 +198,9 @@ if (!isset($_SESSION['user_id']) ) {
                         <img src="http://static.photos/blue/200x200/42" class="w-full h-full object-cover">
                     </div>
                     <b>
-                                <?php echo $_SESSION['user_nom'] . ' ' . $_SESSION['user_prenom']; ?>
+                        <?php echo $_SESSION['user_nom'] . ' ' . $_SESSION['user_prenom']; ?>
 
-                            </b>
+                    </b>
                 </div>
             </header>
 
@@ -320,13 +333,13 @@ if (!isset($_SESSION['user_id']) ) {
 
     <script>
         feather.replace();
-        
+
         // Simple animation for stats cards
         document.querySelectorAll('.bg-white').forEach((card, index) => {
             card.style.opacity = '0';
             card.style.transform = 'translateY(20px)';
             card.style.transition = `all 0.3s ease ${index * 0.1}s`;
-            
+
             setTimeout(() => {
                 card.style.opacity = '1';
                 card.style.transform = 'translateY(0)';
@@ -334,4 +347,5 @@ if (!isset($_SESSION['user_id']) ) {
         });
     </script>
 </body>
+
 </html>

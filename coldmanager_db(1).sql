@@ -104,6 +104,16 @@ CREATE TABLE `inscription` (
   UNIQUE KEY `email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- Structure de la table `clients`
+CREATE TABLE clients (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nom VARCHAR(100) NOT NULL,
+    prenom VARCHAR(100),
+    telephone VARCHAR(30) NOT NULL,
+    email VARCHAR(150),
+    adresse TEXT
+);
+
 --
 -- Index pour les tables déchargées
 --
