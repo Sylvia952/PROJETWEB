@@ -196,7 +196,7 @@ if (isset($_GET['edit'])) {
     <div class="flex-1 overflow-auto">
          <header class="bg-white shadow-sm p-4 flex justify-between items-center">
                 <h2 class="text-xl font-semibold text-blue-800">
-                    <i data-feather="grid" class="inline mr-2"></i> Gestion des produits
+                    <i data-feather="grid" class="inline mr-2"></i> Gestion des catégories
                 </h2>
                   <div class="flex items-center space-x-4">
                     <i data-feather="bell" class="text-blue-600"></i>
