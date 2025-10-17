@@ -1,13 +1,19 @@
 <?php
-// === Détection de l'environnement ===
-if ($_SERVER['HTTP_HOST'] === 'localhost' || $_SERVER['HTTP_HOST'] === '127.0.0.1') {
-    // Connexion locale
+// ==========================================
+// ⚙️ CONFIGURATION AUTO (local / en ligne)
+// ==========================================
+
+// Détection automatique de l'environnement
+$host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+
+if (str_contains($host, 'localhost') || str_contains($host, '127.0.0.1')) {
+    // ✅ Mode LOCAL (XAMPP)
     $servername = "127.0.0.1";
     $dbname     = "coldmanager_db";
     $username   = "root";
     $password   = "";
 } else {
-    // Connexion en ligne (hébergement InfinityFree)
+    // 🌐 Mode EN LIGNE (InfinityFree)
     $servername = "sql311.infinityfree.com";
     $dbname     = "if0_40190078_coldmanagement";
     $username   = "if0_40190078";
@@ -15,13 +21,16 @@ if ($_SERVER['HTTP_HOST'] === 'localhost' || $_SERVER['HTTP_HOST'] === '127.0.0.
 }
 
 try {
-    // Création de la connexion PDO
+    // Connexion PDO
     $pdo = new PDO("mysql:host=$servername;dbname=$dbname;charset=utf8", $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    
+    // (Facultatif) — message de test
+    // echo "<p style='color:green;'>✅ Connecté à la base : <b>$dbname</b></p>";
 
-} catch(PDOException $e) {
-    echo "❌ Erreur : " . $e->getMessage();
+} catch (PDOException $e) {
+    echo "<p style='color:red; font-weight:bold;'>❌ Erreur de connexion à la base de données :</p>";
+    echo "<p>" . htmlspecialchars($e->getMessage()) . "</p>";
+    $pdo = null;
 }
 ?>
