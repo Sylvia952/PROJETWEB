@@ -1,277 +1,361 @@
 <?php
-include "config.php";
 session_start();
-//j'ai supprimer la session qui étais ici 
+include "config.php";
 
-
-try {
-    $stmt = $pdo->prepare("SELECT * FROM ajt_pdt ORDER BY nom ASC");// le nom de la table ici, c'est ajt_pdt et non produits car tu nas pas une table produits dans ta base de donnée et aussi le nom de l'attribut apres  ORDER BY c'est nom et non dtp
-    $stmt->execute();
-    $produits = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-    die("Erreur lors de la récupération des produits: " . $e->getMessage());
+// ✅ Vérifier la connexion
+if (!isset($_SESSION['user_id'])) {
+    header('Location: ../index.php');
+    exit();
 }
 
-$success_message = '';
-if (isset($_GET['id_produit'])) {
-    $success_message = "Produit ajouté avec succès !";
+// ✅ Ajouter un produit
+if (isset($_POST['add'])) {
+    $stmt = $pdo->prepare("INSERT INTO produits (nom, description, prix, quantite, categorie_id) VALUES (?, ?, ?, ?, ?)");
+    $stmt->execute([
+        $_POST['nom'],
+        $_POST['description'],
+        $_POST['prix'],
+        $_POST['quantite'],
+        $_POST['categorie_id']
+    ]);
+    header("Location: produits.php");
+    exit;
 }
+
+// ✅ Modifier un produit
+if (isset($_POST['edit'])) {
+    $stmt = $pdo->prepare("UPDATE produits SET nom=?, description=?, prix=?, quantite=?, categorie_id=? WHERE id=?");
+    $stmt->execute([
+        $_POST['nom'],
+        $_POST['description'],
+        $_POST['prix'],
+        $_POST['quantite'],
+        $_POST['categorie_id'],
+        $_POST['id']
+    ]);
+    header("Location: produits.php");
+    exit;
+}
+
+// ✅ Supprimer un produit
+if (isset($_GET['delete'])) {
+    $stmt = $pdo->prepare("DELETE FROM produits WHERE id=?");
+    $stmt->execute([$_GET['delete']]);
+    header("Location: produits.php");
+    exit;
+}
+
+// ✅ Récupérer la liste des produits
+$produits = $pdo->query("
+    SELECT p.*, c.nom AS categorie_nom 
+    FROM produits p 
+    LEFT JOIN categories c ON p.categorie_id = c.id
+    ORDER BY p.id DESC
+")->fetchAll(PDO::FETCH_ASSOC);
+
+// ✅ Récupérer les données pour modification
+$editProduit = null;
+if (isset($_GET['edit'])) {
+    $stmt = $pdo->prepare("SELECT * FROM produits WHERE id=?");
+    $stmt->execute([$_GET['edit']]);
+    $editProduit = $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+// ✅ Récupérer la liste des catégories pour le select
+$categories = $pdo->query("SELECT * FROM categories ORDER BY nom")->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Liste des Produits - ColdManager</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <title>Cold Manager - Produits</title>
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        .card {
-            transition: transform 0.2s;
-            margin-bottom: 20px;
+        .sidebar {
+            background: linear-gradient(135deg, #e6f7ff 0%, #b3e0ff 100%);
         }
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+
+        .frosty-bg {
+            background-color: #f0f9ff;
         }
-        .badge-categorie {
-            font-size: 0.8rem;
+
+        .alert-bubble {
+            animation: pulse 2s infinite;
         }
-        .table th {
-            background-color: #f8f9fa;
-        }
-        .alert-success {
-            border-radius: 10px;
-        }
-        .expired {
-            background-color: #ffe6e6;
-        }
-        .soon-expiring {
-            background-color: #fff3cd;
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
         }
     </style>
 </head>
-<body>
-    <div class="container-fluid">
-        <div class="row">
-            <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
-                <div class="position-sticky pt-3">
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link active" href="produits.php">
-                                <i class="fas fa-box me-2"></i>
-                                Produits
+
+<body class="frosty-bg">
+    <div class="flex h-screen">
+
+        <!-- ✅ Sidebar -->
+        <div class="sidebar w-64 shadow-lg flex flex-col">
+            <div class="p-4 text-center border-b border-blue-200">
+                <h1 class="text-2xl font-bold text-blue-800 flex items-center justify-center">
+                    <i data-feather="wind" class="mr-2"></i> Cold Manager
+                </h1>
+            </div>
+            <div class="p-4 flex-1">
+                <nav>
+
+                    <ul class="space-y-1">
+
+                        <!-- Lien commun à tous -->
+                        <li>
+                            <a href="dashboard.php" class="flex items-center px-4 py-2 text-blue-900 bg-blue-100 rounded-lg">
+                                <i data-feather="home" class="mr-2"></i> Tableau de bord
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="../ADMIN/ajt_pdt.php">
-                                <i class="fas fa-plus me-2"></i>
-                                Ajouter Produit
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="../deconnexion.php">
-                                <i class="fas fa-sign-out-alt me-2"></i>
-                                Déconnexion
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
 
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 class="h2">
-                        <i class="fas fa-boxes me-2"></i>
-                        Liste des Produits
-                    </h1>
-                    <a href="../ADMIN/ajt_pdt.php" class="btn btn-primary">
-                        <i class="fas fa-plus me-1"></i> Nouveau Produit
-                    </a>
-                </div>
+                        <?php if ($_SESSION['role'] === 'admin'): ?>
+                            <!-- 👑 MENU ADMINISTRATEUR -->
+                            <li>
+                                <a href="employes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                    <i data-feather="users" class="mr-2"></i> Employés
+                                </a>
+                            </li>
 
-                <?php if ($success_message): ?>
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        <?php echo htmlspecialchars($success_message); ?>
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                <?php endif; ?>
+                            <li>
+                                <a href="clients.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                    <i data-feather="user-check" class="mr-2"></i> Clients
+                                </a>
+                            </li>
 
-            
-                <div class="row mb-4">
-                    <div class="col-md-3">
-                        <div class="card text-white bg-primary">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between">
-                                    <div>
-                                        <h4><?php echo count($produits); ?></h4>
-                                        <p>Total Produits</p>
-                                    </div>
-                                    <div class="align-self-center">
-                                        <i class="fas fa-boxes fa-2x"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <?php
+                            <li>
+                                <a href="produits.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                    <i data-feather="package" class="mr-2"></i> Produits
+                                </a>
+                            </li>
 
-                    $categories_count = [];
-                    foreach ($produits as $produit) {
-                        $categorie = $produit['categorie'];
-                        if (!isset($categories_count[$categorie])) {
-                            $categories_count[$categorie] = 0;
-                        }
-                        $categories_count[$categorie]++;
-                    }
-                    
-                    $categorie_colors = [
-                        'poissons' => 'info',
-                        'viandes' => 'danger',
-                        'saucisses' => 'warning'
-                    ];
-                    
-                    foreach ($categories_count as $categorie => $count):
-                        $color = $categorie_colors[$categorie] ?? 'secondary';
-                    ?>
-                    <div class="col-md-3">
-                        <div class="card text-white bg-<?php echo $color; ?>">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between">
-                                    <div>
-                                        <h4><?php echo $count; ?></h4>
-                                        <p><?php echo strtoupper($categorie); ?></p>
-                                    </div>
-                                    <div class="align-self-center">
-                                        <i class="fas fa-<?php echo $categorie == 'poissons' ? 'fish' : ($categorie == 'viandes' ? 'drumstick-bite' : 'hotdog'); ?> fa-2x"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <?php endforeach; ?>
-                </div>
+                            <li>
+                                <a href="categories.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                    <i data-feather="grid" class="mr-2"></i> Catégories
+                                </a>
+                            </li>
 
-            
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">
-                            <i class="fas fa-list me-2"></i>
-                            Détails des Produits
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <?php if (empty($produits)): ?>
-                            <div class="alert alert-info text-center">
-                                <i class="fas fa-info-circle me-2"></i>
-                                Aucun produit enregistré pour le moment.
-                                <a href="../ADMIN/ajt_pdt.php" class="alert-link">Ajouter un produit</a>
-                            </div>
-                        <?php else: ?>
-                            <div class="table-responsive">
-                                <table class="table table-striped table-hover">
-                                    <thead class="thead-light">
-                                        <tr>
-                                            <th>ID</th>
-                                            <th>Catégorie</th>
-                                            <th>Nom</th>
-                                            <th>Date de Péremption</th>
-                                            <th>Jours Restants</th>
-                                            <th>Statut</th>
-                                            <th>Date d'ajout</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php foreach ($produits as $produit): 
-                                            $date_peremption = new DateTime($produit['dtp']);
-                                            $aujourdhui = new DateTime();
-                                            $interval = $aujourdhui->diff($date_peremption);
-                                            $jours_restants = $interval->days;
-                                            $is_past = $interval->invert; 
-                                            
-                                            if ($is_past) {
-                                                $statut = 'text-danger';
-                                                $badge = 'danger';
-                                                $message = 'Expiré';
-                                                $row_class = 'expired';
-                                            } elseif ($jours_restants <= 3) {
-                                                $statut = 'text-warning';
-                                                $badge = 'warning';
-                                                $message = 'Bientôt expiré';
-                                                $row_class = 'soon-expiring';
-                                            } else {
-                                                $statut = 'text-success';
-                                                $badge = 'success';
-                                                $message = 'Valide';
-                                                $row_class = '';
-                                            }
-                                        ?>
-                                        <tr class="<?php echo $row_class; ?>">
-                                            <td><?php echo htmlspecialchars($produit['id']); ?></td>
-                                            <td>
-                                                <span class="badge badge-<?php echo $categorie_colors[$produit['categorie']] ?? 'secondary'; ?> badge-categorie">
-                                                    <?php echo strtoupper(htmlspecialchars($produit['categorie'])); ?>
-                                                </span>
-                                            </td>
-                                            <td><?php echo htmlspecialchars($produit['nom']); ?></td>
-                                            <td><?php echo htmlspecialchars(date('d/m/Y', strtotime($produit['dtp']))); ?></td>
-                                            <td class="<?php echo $statut; ?> font-weight-bold">
-                                                <?php 
-                                                if ($is_past) {
-                                                    echo 'Expiré depuis ' . $jours_restants . ' jour(s)';
-                                                } else {
-                                                    echo $jours_restants . ' jour(s)';
-                                                }
-                                                ?>
-                                            </td>
-                                            <td>
-                                                <span class="badge badge-<?php echo $badge; ?>">
-                                                    <?php echo $message; ?>
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <?php echo htmlspecialchars(date('d/m/Y H:i', strtotime($produit['created_at']))); ?>
-                                            </td>
-                                            <td>
-                                                <div class="btn-group btn-group-sm">
-                                                    <a href="modif_pdt.php?id=<?php echo $produit['id']; ?>" class="btn btn-outline-primary" title="Modifier">
-                                                        <i class="fas fa-edit"></i>
-                                                    </a>
-                                                    <a href="suppr_pdt.php?id=<?php echo $produit['id']; ?>" 
-                                                       class="btn btn-outline-danger" 
-                                                       onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce produit ?')">
-                                                        <i class="fas fa-trash"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <?php endforeach; ?>
-                                    </tbody>
-                                </table>
-                            </div>
+                            <li>
+                                <a href="ventes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                    <i data-feather="shopping-cart" class="mr-2"></i> Ventes
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="factures.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                    <i data-feather="file-text" class="mr-2"></i> Factures
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="alertes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                    <i data-feather="bell" class="mr-2"></i> Alertes
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="paiements.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                    <i data-feather="credit-card" class="mr-2"></i> Paiements
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="statistiques.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                    <i data-feather="bar-chart-2" class="mr-2"></i> Statistiques
+                                </a>
+                            </li>
+
+                        <?php elseif ($_SESSION['role'] === 'user'): ?>
+                            <!-- 👷 MENU EMPLOYÉ -->
+                            <li>
+                                <a href="clients.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                    <i data-feather="users" class="mr-2"></i> Clients
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="ventes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                    <i data-feather="shopping-cart" class="mr-2"></i> Enregistrer une vente
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="produits.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                    <i data-feather="package" class="mr-2"></i> Produits disponibles
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="factures.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                    <i data-feather="file-text" class="mr-2"></i> Factures
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="alertes.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                    <i data-feather="bell" class="mr-2"></i> Alertes
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="paiements.php" class="flex items-center px-4 py-2 text-blue-800 hover:bg-blue-50 rounded-lg">
+                                    <i data-feather="credit-card" class="mr-2"></i> Paiements
+                                </a>
+                            </li>
+
                         <?php endif; ?>
+
+                        <!-- Lien commun -->
+                        <li>
+                            <a href="../deconnexion.php" class="flex items-center px-4 py-2 text-red-700 hover:bg-red-50 rounded-lg">
+                                <i data-feather="log-out" class="mr-2"></i> Déconnexion
+                            </a>
+                        </li>
+
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <!-- ✅ Contenu principal -->
+        <div class="flex-1 overflow-auto">
+            <header class="bg-white shadow-sm p-4 flex justify-between items-center">
+                <h2 class="text-xl font-semibold text-blue-800">
+                    <i data-feather="package" class="inline mr-2"></i> Gestion des produits
+                </h2>
+                  <div class="flex items-center space-x-4">
+                    <i data-feather="bell" class="text-blue-600"></i>
+                    <div class="w-8 h-8 rounded-full bg-blue-100 overflow-hidden">
+                        <img src="http://static.photos/blue/200x200/42" class="w-full h-full object-cover">
+                    </div>
+                    <b><?= $_SESSION['user_nom'] . ' ' . $_SESSION['user_prenom'] ?></b>
+                </div>
+            </header>
+
+            <main class="p-6">
+                <!-- ✅ Liste des produits -->
+                <div class="bg-white rounded-lg shadow p-6 mb-8">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-semibold text-blue-800 text-xl">Liste des produits</h3>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">Ajouter</button>
+                    </div>
+
+                    <table class="table table-bordered">
+                        <thead class="bg-blue-50">
+                            <tr>
+                                <th>Nom</th>
+                                <th>Description</th>
+                                <th>Prix</th>
+                                <th>Quantité</th>
+                                <th>Catégorie</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($produits as $p): ?>
+                                <tr>
+                                    <td><?= htmlspecialchars($p['nom']) ?></td>
+                                    <td><?= htmlspecialchars($p['description']) ?></td>
+                                    <td><?= htmlspecialchars($p['prix']) ?> €</td>
+                                    <td><?= htmlspecialchars($p['quantite']) ?></td>
+                                    <td><?= htmlspecialchars($p['categorie_nom']) ?></td>
+                                    <td>
+                                        <a href="?edit=<?= $p['id'] ?>" class="btn btn-warning btn-sm">Modifier</a>
+                                        <a href="?delete=<?= $p['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Supprimer ce produit ?')">Supprimer</a>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- ✅ Modal Ajout -->
+                <div class="modal fade" id="addModal" tabindex="-1">
+                    <div class="modal-dialog">
+                        <form method="post" class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Ajouter un produit</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <input type="text" name="nom" class="form-control mb-2" placeholder="Nom" required>
+                                <textarea name="description" class="form-control mb-2" placeholder="Description"></textarea>
+                                <input type="number" step="0.01" name="prix" class="form-control mb-2" placeholder="Prix" required>
+                                <input type="number" name="quantite" class="form-control mb-2" placeholder="Quantité" required>
+                                <select name="categorie_id" class="form-control mb-2" required>
+                                    <option value="">-- Sélectionner une catégorie --</option>
+                                    <?php foreach ($categories as $c): ?>
+                                        <option value="<?= $c['id'] ?>"><?= htmlspecialchars($c['nom']) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" name="add" class="btn btn-primary">Ajouter</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
+
+                <!-- ✅ Modal Édition -->
+                <?php if ($editProduit): ?>
+                    <div class="modal fade show" style="display:block; background:rgba(0,0,0,0.5);" id="editModal">
+                        <div class="modal-dialog">
+                            <form method="post" class="modal-content">
+                                <input type="hidden" name="id" value="<?= $editProduit['id'] ?>">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Modifier le produit</h5>
+                                    <a href="produits.php" class="btn-close"></a>
+                                </div>
+                                <div class="modal-body">
+                                    <input type="text" name="nom" class="form-control mb-2" value="<?= htmlspecialchars($editProduit['nom']) ?>" required>
+                                    <textarea name="description" class="form-control mb-2"><?= htmlspecialchars($editProduit['description']) ?></textarea>
+                                    <input type="number" step="0.01" name="prix" class="form-control mb-2" value="<?= htmlspecialchars($editProduit['prix']) ?>" required>
+                                    <input type="number" name="quantite" class="form-control mb-2" value="<?= htmlspecialchars($editProduit['quantite']) ?>" required>
+                                    <select name="categorie_id" class="form-control mb-2" required>
+                                        <?php foreach ($categories as $c): ?>
+                                            <option value="<?= $c['id'] ?>" <?= $c['id'] == $editProduit['categorie_id'] ? 'selected' : '' ?>><?= htmlspecialchars($c['nom']) ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" name="edit" class="btn btn-warning">Modifier</button>
+                                    <a href="produits.php" class="btn btn-secondary">Annuler</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <script>
+                        document.body.classList.add('modal-open');
+                    </script>
+                <?php endif; ?>
             </main>
         </div>
     </div>
 
-    
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
-    
     <script>
-    
-        $(document).ready(function() {
-            setTimeout(function() {
-                $('.alert').alert('close');
-            }, 5000);
-        });
+        feather.replace();
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

@@ -114,6 +114,54 @@ CREATE TABLE clients (
     adresse TEXT
 );
 
+
+
+CREATE TABLE IF NOT EXISTS categories (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nom VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS produits (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nom VARCHAR(255) NOT NULL,
+    description TEXT,
+    prix DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    quantite INT NOT NULL DEFAULT 0,
+    categorie_id INT,
+    FOREIGN KEY (categorie_id) REFERENCES categories(id) ON DELETE SET NULL
+);
+
+
+
+CREATE TABLE ventes (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  produit_id INT NOT NULL,
+  client_id INT NOT NULL,
+  quantite INT NOT NULL,
+  prix_total DECIMAL(10,2) NOT NULL,
+  date_vente DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (produit_id) REFERENCES produits(id) ON DELETE CASCADE,
+  FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE IF NOT EXISTS factures (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    vente_id INT NOT NULL,
+    numero_facture VARCHAR(50) NOT NULL UNIQUE,
+    montant_total DECIMAL(10,0) NOT NULL,
+    date_facture DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (vente_id) REFERENCES ventes(id) ON DELETE CASCADE
+);
+CREATE TABLE alertes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    client_id INT NULL,
+    message VARCHAR(255) NOT NULL,
+    date_alert DATETIME DEFAULT CURRENT_TIMESTAMP,
+    lue TINYINT(1) DEFAULT 0,
+    FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE SET NULL
+);
+
 --
 -- Index pour les tables déchargées
 --
