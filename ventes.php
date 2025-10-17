@@ -1,40 +1,21 @@
 <?php
 session_start();
 include "config.php";
+
 if (!isset($_SESSION['user_id'])) {
     header('Location: ../index.php');
     exit();
 }
 
-// ➕ Ajouter une vente
+// Ajouter une vente
 if (isset($_POST['add'])) {
-    $produit_id = $_POST['produit_id'];
-    $client_id = $_POST['client_id'];
-    $quantite = $_POST['quantite'];
-
-    // Récupérer le prix et la quantité du produit
-    $stmt = $pdo->prepare("SELECT prix, quantite FROM produits WHERE id=?");
-    $stmt->execute([$produit_id]);
-    $produit = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if ($produit && $quantite > 0 && $quantite <= $produit['quantite']) {
-        $total = $produit['prix'] * $quantite;
-
-        // Insérer la vente
-        $stmt = $pdo->prepare("INSERT INTO ventes (produit_id, client_id, quantite, total) VALUES (?, ?, ?, ?)");
-        $stmt->execute([$produit_id, $client_id, $quantite, $total]);
-
-        // Mettre à jour le stock
-        $newStock = $produit['quantite'] - $quantite;
-        $updateStock = $pdo->prepare("UPDATE produits SET quantite=? WHERE id=?");
-        $updateStock->execute([$newStock, $produit_id]);
-    }
-
+    $stmt = $pdo->prepare("INSERT INTO ventes (produit_id, client_id, quantite, prix_total, date_vente) VALUES (?, ?, ?, ?, NOW())");
+    $stmt->execute([$_POST['produit_id'], $_POST['client_id'], $_POST['quantite'], $_POST['prix_total']]);
     header("Location: ventes.php");
     exit;
 }
 
-// 🗑️ Supprimer une vente
+// Supprimer une vente
 if (isset($_GET['delete'])) {
     $stmt = $pdo->prepare("DELETE FROM ventes WHERE id=?");
     $stmt->execute([$_GET['delete']]);
@@ -42,18 +23,16 @@ if (isset($_GET['delete'])) {
     exit;
 }
 
-// 📋 Récupérer la liste des ventes
-$ventes = $pdo->query("
-    SELECT v.*, p.nom AS produit_nom, c.nom AS client_nom
+// Récupérer toutes les ventes
+$ventes = $pdo->query("SELECT v.*, p.nom AS produit_nom, p.prix AS produit_prix, c.nom AS client_nom 
     FROM ventes v
     JOIN produits p ON v.produit_id = p.id
     JOIN clients c ON v.client_id = c.id
-    ORDER BY v.id DESC
-")->fetchAll(PDO::FETCH_ASSOC);
+    ORDER BY v.date_vente DESC")->fetchAll(PDO::FETCH_ASSOC);
 
 // Récupérer les produits et clients pour le formulaire
-$produits = $pdo->query("SELECT id, nom FROM produits")->fetchAll(PDO::FETCH_ASSOC);
-$clients = $pdo->query("SELECT id, nom FROM clients")->fetchAll(PDO::FETCH_ASSOC);
+$produits = $pdo->query("SELECT * FROM produits ORDER BY nom")->fetchAll(PDO::FETCH_ASSOC);
+$clients = $pdo->query("SELECT * FROM clients ORDER BY nom")->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -61,22 +40,22 @@ $clients = $pdo->query("SELECT id, nom FROM clients")->fetchAll(PDO::FETCH_ASSOC
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cold Management - Ventes</title>
+    <title>Gestion des ventes - Cold Manager</title>
     <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         .sidebar {
             background: linear-gradient(135deg, #e6f7ff 0%, #b3e0ff 100%);
         }
-        .frosty-bg { background-color: #f0f9ff; }
+        .frosty-bg {
+            background-color: #f0f9ff;
+        }
     </style>
 </head>
 <body class="frosty-bg">
 <div class="flex h-screen">
-
     <!-- Sidebar -->
     <div class="sidebar w-64 shadow-lg flex flex-col">
         <div class="p-4 text-center border-b border-blue-200">
@@ -86,7 +65,7 @@ $clients = $pdo->query("SELECT id, nom FROM clients")->fetchAll(PDO::FETCH_ASSOC
         </div>
 
         <div class="p-4 flex-1">
-           <nav>
+         <nav>
                     <ul class="space-y-1">
 
                         <!-- Lien commun à tous -->
@@ -205,11 +184,11 @@ $clients = $pdo->query("SELECT id, nom FROM clients")->fetchAll(PDO::FETCH_ASSOC
         </div>
     </div>
 
-    <!-- Contenu principal -->
+    <!-- Main content -->
     <div class="flex-1 overflow-auto">
-        <header class="bg-white shadow-sm p-4 flex justify-between items-center">
+      <header class="bg-white shadow-sm p-4 flex justify-between items-center">
                 <h2 class="text-xl font-semibold text-blue-800">
-                    <i data-feather="users" class="inline mr-2"></i> Gestion des ventes
+                    <i data-feather="shopping-cart" class="inline mr-2"></i> Gestion des ventes
                 </h2>
 
                 <div class="flex items-center space-x-4">
@@ -232,72 +211,86 @@ $clients = $pdo->query("SELECT id, nom FROM clients")->fetchAll(PDO::FETCH_ASSOC
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="font-semibold text-blue-800 text-xl">Liste des ventes</h3>
                     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
-                        <i data-feather="plus"></i> Ajouter
+                        Nouvelle vente
                     </button>
                 </div>
-
-                <div class="overflow-x-auto">
-                    <table class="table table-bordered w-full">
-                        <thead class="bg-blue-50">
-                            <tr>
-                                <th>Produit</th>
-                                <th>Client</th>
-                                <th>Quantité</th>
-                                <th>Total</th>
-                                <th>Date</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                <table class="table table-bordered w-full">
+                    <thead class="bg-blue-50">
+                        <tr>
+                            <th>Produit</th>
+                            <th>Client</th>
+                            <th>Quantité</th>
+                            <th>Prix total (FCFA)</th>
+                            <th>Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
                         <?php foreach ($ventes as $v): ?>
                             <tr>
                                 <td><?= htmlspecialchars($v['produit_nom']) ?></td>
                                 <td><?= htmlspecialchars($v['client_nom']) ?></td>
-                                <td><?= $v['quantite'] ?></td>
-                                <td><strong><?= number_format($v['total'], 2, ',', ' ') ?> F</strong></td>
-                                <td><?= date('d/m/Y H:i', strtotime($v['date_vente'])) ?></td>
+                                <td><?= htmlspecialchars($v['quantite']) ?></td>
+                                <td><?= htmlspecialchars(number_format($v['prix_total'], 0, ',', ' ')) ?> FCFA</td>
+                                <td><?= htmlspecialchars($v['date_vente']) ?></td>
                                 <td>
                                     <a href="?delete=<?= $v['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Supprimer cette vente ?')">
-                                        <i data-feather="trash-2"></i>
+                                        Supprimer
                                     </a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
+                    </tbody>
+                </table>
             </div>
         </main>
     </div>
 </div>
 
-<!-- Modal Ajout Vente -->
+<!-- Modal Ajout -->
 <div class="modal fade" id="addModal" tabindex="-1">
   <div class="modal-dialog">
     <form method="post" class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Nouvelle Vente</h5>
+        <h5 class="modal-title">Nouvelle vente</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
-        <select name="produit_id" class="form-select mb-3" required>
-            <option value="">Sélectionner un produit</option>
+        <label>Produit :</label>
+        <select name="produit_id" id="produit_id" class="form-control mb-3" required>
+            <option value="">-- Sélectionner un produit --</option>
             <?php foreach ($produits as $p): ?>
-                <option value="<?= $p['id'] ?>"><?= htmlspecialchars($p['nom']) ?></option>
+                <option value="<?= $p['id'] ?>" data-prix="<?= $p['prix'] ?>">
+                    <?= htmlspecialchars($p['nom']) ?>
+                </option>
             <?php endforeach; ?>
         </select>
 
-        <select name="client_id" class="form-select mb-3" required>
-            <option value="">Sélectionner un client</option>
+        <div class="mb-3">
+            <label>Prix unitaire (FCFA)</label>
+            <input type="number" id="prix_unitaire" class="form-control" readonly>
+        </div>
+
+        <div class="mb-3">
+            <label>Quantité :</label>
+            <input type="number" name="quantite" id="quantite" class="form-control" placeholder="Quantité" required>
+        </div>
+
+        <div class="mb-3">
+            <label>Prix total (FCFA)</label>
+            <input type="number" step="0.01" name="prix_total" id="prix_total" class="form-control" readonly required>
+        </div>
+
+        <label>Client :</label>
+        <select name="client_id" class="form-control mb-2" required>
+            <option value="">-- Sélectionner un client --</option>
             <?php foreach ($clients as $c): ?>
                 <option value="<?= $c['id'] ?>"><?= htmlspecialchars($c['nom']) ?></option>
             <?php endforeach; ?>
         </select>
-
-        <input type="number" name="quantite" class="form-control mb-2" placeholder="Quantité" min="1" required>
       </div>
       <div class="modal-footer">
-        <button type="submit" name="add" class="btn btn-success">Enregistrer</button>
+        <button type="submit" name="add" class="btn btn-primary">Enregistrer</button>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
       </div>
     </form>
@@ -305,6 +298,29 @@ $clients = $pdo->query("SELECT id, nom FROM clients")->fetchAll(PDO::FETCH_ASSOC
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script>feather.replace();</script>
+<script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+<script>
+feather.replace();
+
+// 💰 Calcul automatique du prix total en FCFA
+document.addEventListener("DOMContentLoaded", function () {
+    const produitSelect = document.getElementById("produit_id");
+    const prixUnitaireInput = document.getElementById("prix_unitaire");
+    const quantiteInput = document.getElementById("quantite");
+    const prixTotalInput = document.getElementById("prix_total");
+
+    function calculerPrixTotal() {
+        const selectedOption = produitSelect.options[produitSelect.selectedIndex];
+        const prixUnitaire = parseFloat(selectedOption.getAttribute("data-prix")) || 0;
+        const quantite = parseInt(quantiteInput.value) || 0;
+
+        prixUnitaireInput.value = prixUnitaire.toFixed(0);
+        prixTotalInput.value = (prixUnitaire * quantite).toFixed(0);
+    }
+
+    produitSelect.addEventListener("change", calculerPrixTotal);
+    quantiteInput.addEventListener("input", calculerPrixTotal);
+});
+</script>
 </body>
 </html>

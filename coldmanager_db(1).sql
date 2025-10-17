@@ -131,6 +131,29 @@ CREATE TABLE IF NOT EXISTS produits (
     FOREIGN KEY (categorie_id) REFERENCES categories(id) ON DELETE SET NULL
 );
 
+
+
+CREATE TABLE ventes (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  produit_id INT NOT NULL,
+  client_id INT NOT NULL,
+  quantite INT NOT NULL,
+  prix_total DECIMAL(10,2) NOT NULL,
+  date_vente DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (produit_id) REFERENCES produits(id) ON DELETE CASCADE,
+  FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE IF NOT EXISTS factures (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    vente_id INT NOT NULL,
+    numero_facture VARCHAR(50) NOT NULL UNIQUE,
+    montant_total DECIMAL(10,0) NOT NULL,
+    date_facture DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (vente_id) REFERENCES ventes(id) ON DELETE CASCADE
+);
+
 --
 -- Index pour les tables déchargées
 --
